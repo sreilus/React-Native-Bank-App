@@ -6,8 +6,8 @@ import { AppLoading } from 'expo';
 import MusicApp from './app/index';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-import Index from '../Part 2/app/index';
-import HomeScreen from '..//Part 2/Screens/HomeScreen';
+import Index from '../React-Native-Bank-App/app/index';
+import HomeScreen from '..//React-Native-Bank-App/Screens/HomeScreen';
 import AppNavigator from './AppNavigator';
 
 function cacheImages(images) {
