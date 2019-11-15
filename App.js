@@ -8,6 +8,7 @@ import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import Index from '../React-Native-Bank-App/app/index';
 import HomeScreen from '..//React-Native-Bank-App/Screens/HomeScreen';
+import Register from '..//React-Native-Bank-App/Screens/Register';
 import AppNavigator from './AppNavigator';
 
 function cacheImages(images) {
@@ -22,7 +23,8 @@ function cacheImages(images) {
 
 const MainNavigator = createStackNavigator({
   Home: {screen: HomeScreen},
-  Index: {screen: Index}
+  Index: {screen: Index},
+  Register: {screen: Register}
 });
 
 export default class App extends React.Component {

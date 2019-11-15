@@ -4,10 +4,6 @@ import Svg, { Image, Circle, ClipPath } from 'react-native-svg';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 
-import FormData from 'form-data';
-import { createStackNavigator, createAppContainer } from 'react-navigation';
-import HomeScreen from '../Screens/HomeScreen';
-
 import Animated, { Easing } from 'react-native-reanimated';
 import { TapGestureHandler, State } from 'react-native-gesture-handler';
 const { width, height } = Dimensions.get('window');
@@ -37,7 +33,7 @@ const validationSchema = yup.object().shape({
     .string()
     .required()
     .label('Name')
-    .min(2, 'En az2 karakter')
+    .min(2, 'En az 2 karakter')
     .max(5, 'max 5 karakter'),
 });
 
@@ -276,7 +272,7 @@ class MusicApp extends Component {
                     <Text style={{ fontSize: 20, fontWeight: 'bold' }}>SIGN IN</Text>
                   </Animated.View>
                 </TapGestureHandler>
-                <TouchableOpacity onPress={() => navigate('Home', { name: 'Jack' })}>
+                <TouchableOpacity onPress={() => navigate('Register', { name: 'Jack' })}>
                   <Animated.View
                     style={{
                       ...styles.button,
