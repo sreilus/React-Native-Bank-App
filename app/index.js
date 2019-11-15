@@ -272,7 +272,7 @@ class MusicApp extends Component {
                     <Text style={{ fontSize: 20, fontWeight: 'bold' }}>SIGN IN</Text>
                   </Animated.View>
                 </TapGestureHandler>
-                <TouchableOpacity onPress={() => navigate('Register', { name: 'Jack' })}>
+                <TouchableOpacity onPress={() => navigate('Deneme', { name: 'Jack' })}>
                   <Animated.View
                     style={{
                       ...styles.button,
@@ -282,7 +282,7 @@ class MusicApp extends Component {
                     }}
                   >
                     <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>
-                      SIGN IN WITH FACEBOOK
+                      SIGN UP
             </Text>
                   </Animated.View>
                 </TouchableOpacity>

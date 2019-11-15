@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
-import { Text, View, TextInput, StyleSheet, ScrollView,Button } from 'react-native'
+import { Text, View, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import DatePicker from 'react-native-datepicker'
+import Animated, { Easing } from 'react-native-reanimated';
 
 
 class Register extends Component {
     static navigationOptions = {
-        title: 'Welcome',
-        header: null
-
+        title: 'Welcome'
     };
     constructor(props) {
         super(props)
@@ -83,7 +82,13 @@ class Register extends Component {
                         secureTextEntry={true}
                         placeholderTextColor="gray"
                     />
-                    <Button  title="Press me"></Button>
+                    <TouchableOpacity onPress={this.onPress}>
+                        <Animated.View style={styles.signInButton}>
+                            <Text styles={{ fontSize: 20, fontWeight: 'bold' }}>
+                                SIGN IN
+                             </Text>
+                        </Animated.View>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         )
@@ -102,7 +107,20 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         borderColor: 'black',
         backgroundColor: 'white'
-    }
+    },
+    signInButton: {
+        backgroundColor: '#33FF6D',
+        height: 70,
+        marginHorizontal: 20,
+        borderRadius: 35,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 5,
+        shadowOffset: { width: 2, height: 2 },
+        shadowColor: 'black',
+        shadowOpacity: 0.2,
+        elevation: 3,
+      }
 });
 
 export default Register;
