@@ -196,22 +196,6 @@ class MusicApp extends Component {
 
   componentDidMount = () => {
     StatusBar.setHidden(true);
-    /*fetch('https://bankappcorewebapirugrats.azurewebsites.net/api/user/2')
-      .then((response) => response.json())
-      .then((responseJson) => {
-
-        this.setState({
-          isLoading: false,
-          dataSource: responseJson,
-        }, function(){
-
-        });
-
-      })
-      .catch((error) =>{
-        console.error(error);
-      });*/
-
   }
 
 

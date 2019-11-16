@@ -6,6 +6,7 @@ import AccountList from './Screens/AccountList';
 import Register from '..//React-Native-Bank-App/Screens/Register';
 import Deneme from '..//React-Native-Bank-App/Screens/Deneme';
 import Login from '..//React-Native-Bank-App/Screens/Login';
+import YupTest from '..//React-Native-Bank-App/Screens/YupTest';
 
 const RootStack = createStackNavigator(
     {
@@ -14,10 +15,11 @@ const RootStack = createStackNavigator(
         AccountList: {screen: AccountList},
         Register: {screen: Register},
         Deneme: {screen: Deneme},
-        Login: {screen: Login}
+        Login: {screen: Login},
+        YupTest: {screen: YupTest}
     },
     {
-        initialRouteName: 'Deneme'
+        initialRouteName: 'YupTest'
     }
 );
 

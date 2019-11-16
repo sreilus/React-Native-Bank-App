@@ -14,6 +14,8 @@ const { height } = Dimensions.get('window');
 class Login extends Component {
     state = {
         active: null,
+        tcIdentityKey: 0,
+        password: ''
     }
 
     static navigationOptions = {
@@ -25,6 +27,38 @@ class Login extends Component {
         const { active } = this.state;
         this.setState({ active: active === id ? null : id });
     }
+
+    onPress = () => {
+
+        fetch('https://rugratswebapi.azurewebsites.net/api/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                TcIdentityKey: this.state.tcIdentityKey,
+                userPassword: this.state.password
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response => {
+            return response.json()
+        }).then(json => {
+            this.setState({
+                resultt: json
+            });
+            console.log(this.state.resultt);
+            let deger = '' + this.state.resultt;
+            const { navigate } = this.props.navigation;
+
+            if (deger == "1") {
+                navigate('Home', { tcNumber: this.state.tcIdentityKey });
+                ToastAndroid.show("Giriş Başarılı!", ToastAndroid.SHORT);
+            }
+            else {
+                alert("Kimlik No veya Şifre Hatalı!");
+            }
+        });
+    };
+
 
     render() {
         const { navigation } = this.props;
@@ -70,20 +104,23 @@ class Login extends Component {
                                 full
                                 label="Tc Identity Key"
                                 number
+                                maxLength={11}
                                 style={{ marginBottom: 25 }}
+                                onChangeText={(tcIdentityKey) => { this.setState({ tcIdentityKey: tcIdentityKey }) }}
                             />
                             <Input
                                 full
                                 password
                                 label="Password"
-
+                                maxLength={30}
                                 style={{ marginBottom: 25 }}
+                                onChangeText={(password) => { this.setState({ password: password }) }}
                             />
 
                             <Button
                                 full
                                 style={{ marginBottom: 12 }}
-                                onPress={() => navigation.navigate('Overview')}
+                                onPress={this.onPress}
                             >
                                 <Text button>Sign In</Text>
                             </Button>
