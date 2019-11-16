@@ -19,7 +19,7 @@ const RootStack = createStackNavigator(
         YupTest: {screen: YupTest}
     },
     {
-        initialRouteName: 'YupTest'
+        initialRouteName: 'Login'
     }
 );
 

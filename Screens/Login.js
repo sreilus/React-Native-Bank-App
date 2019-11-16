@@ -1,15 +1,31 @@
 import React, { Component } from 'react';
 import {
-    Image, StyleSheet, Dimensions, TouchableWithoutFeedback, ImageBackground
+    Image, StyleSheet, Dimensions, TouchableWithoutFeedback, ImageBackground,Text
 } from 'react-native';
 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { Button, Block, Text, Input } from '../components';
+import { Button, Block, Text as TextCmp, Input } from '../components';
 import * as theme from '../constants/theme';
-import { Header } from 'react-navigation-stack';
+import { requiredText, tcText } from '../constants/strings';
+import { Formik } from 'formik';
+import * as yup from 'yup';
 
-const { height } = Dimensions.get('window');
+const validationSchema = yup.object().shape({
+    tcIdentityKey: yup
+        .number()
+        .label('tcIdentityKey')
+        .moreThan(9999999999, tcText)
+        .lessThan(100000000000, tcText)
+        .required(requiredText),
+    password: yup
+        .string()
+        .label('password')
+        .min(1, 'En az 2 karakter girmelisiniz!')
+        .max(20, 'En fazla 20 karakter girebilirsiniz!')
+        .required(requiredText),
+});
+
 
 class Login extends Component {
     state = {
@@ -28,13 +44,13 @@ class Login extends Component {
         this.setState({ active: active === id ? null : id });
     }
 
-    onPress = () => {
-
+    onPress = (values) => {
+        console.log(values);
         fetch('https://rugratswebapi.azurewebsites.net/api/login', {
             method: 'POST',
             body: JSON.stringify({
-                TcIdentityKey: this.state.tcIdentityKey,
-                userPassword: this.state.password
+                TcIdentityKey: values.tcIdentityKey,
+                userPassword: values.password
             }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
@@ -50,7 +66,7 @@ class Login extends Component {
             const { navigate } = this.props.navigation;
 
             if (deger == "1") {
-                navigate('Home', { tcNumber: this.state.tcIdentityKey });
+                navigate('Home', { tcNumber: values.tcIdentityKey });
                 ToastAndroid.show("Giriş Başarılı!", ToastAndroid.SHORT);
             }
             else {
@@ -87,6 +103,17 @@ class Login extends Component {
 
         return (
             <ImageBackground source={require('../assets/bgimage.jpg')} style={styles.backgroundImage}>
+                <Formik initialValues={{ tcIdentityKey: 0, password: '' }}
+                    onSubmit={(values, actions) => {
+                        //alert(JSON.stringify(values.firstName));
+                        this.onPress(values)
+                        setTimeout(() => {
+                            actions.setSubmitting(false);
+                        }, 1000);
+                        
+                    }}              
+                    validationSchema={validationSchema}>
+                        {formikProps => (
                 <KeyboardAwareScrollView style={{ marginVertical: 40 }} showsVerticalScrollIndicator={false}>
                     <Block center middle style={{ marginBottom: 20, marginTop: 20 }}>
                         <Image
@@ -96,45 +123,52 @@ class Login extends Component {
                     </Block>
                     <Block center>
                         <Text h3 style={{ marginBottom: 6 }}>
-                            SIGN IN
+                            GİRİŞ YAP
                     </Text>
 
                         <Block center style={{ marginTop: 25 }}>
                             <Input
                                 full
-                                label="Tc Identity Key"
+                                label="Tc Kimlik No"
                                 number
                                 maxLength={11}
-                                style={{ marginBottom: 25 }}
-                                onChangeText={(tcIdentityKey) => { this.setState({ tcIdentityKey: tcIdentityKey }) }}
+                                style={{ marginBottom: 5 }}
+                                onChangeText={formikProps.handleChange("tcIdentityKey")}
                             />
+                            <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.tcIdentityKey}
+                                    </Text>
                             <Input
                                 full
                                 password
-                                label="Password"
+                                label="Şİfre"
                                 maxLength={30}
-                                style={{ marginBottom: 25 }}
-                                onChangeText={(password) => { this.setState({ password: password }) }}
+                                style={{ marginBottom: 5 }}
+                                onChangeText={formikProps.handleChange("password")}
                             />
-
+                            <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.password}
+                                    </Text>
                             <Button
                                 full
                                 style={{ marginBottom: 12 }}
-                                onPress={this.onPress}
+                                onPress={formikProps.handleSubmit}
                             >
-                                <Text button>Sign In</Text>
+                                <Text button>Giriş Yap</Text>
                             </Button>
-                            <Text paragraph color="gray">
-                                Aren't you registered? <Text
+                            <TextCmp paragraph color="gray">
+                                Kayıtlı değil misin? <TextCmp
                                     height={18}
                                     color="blue"
                                     onPress={() => navigation.navigate('Deneme')}>
-                                    Sign Up
-                            </Text>
-                            </Text>
+                                    Kayıt Ol
+                            </TextCmp>
+                            </TextCmp>
                         </Block>
                     </Block>
                 </KeyboardAwareScrollView>
+                        )}
+                </Formik>
             </ImageBackground>
         )
     }

@@ -21,8 +21,6 @@ const FieldWrapper = ({ children, label, formikProps, formikKey }) => (
   </View>
 );
 
-let deger='';
-
 const StyledInput = ({ label, formikProps, formikKey, ...rest }) => {
   const inputStyles = {
     borderWidth: 1,
@@ -76,7 +74,7 @@ const validationSchema = yup.object().shape({
     .required()
     .label('Confirm password')
     .test('passwords-match', 'Passwords must match ya fool', function(value) {
-      return this.deger=value;
+      return this.parent.password === value;
     }),
   agreeToTerms: yup
     .boolean()
@@ -88,11 +86,15 @@ const validationSchema = yup.object().shape({
     ),
 });
 
-onDeneme=(deneme)=>{
-    console.log(deneme);
-}
-
-
+const signUp = ({ email }) =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (email === 'a@a.com') {
+        reject(new Error("You playin' with that fake email address."));
+      }
+      resolve(true);
+    }, 1000);
+  });
 
 export default () => (
   <SafeAreaView style={{ marginTop: 90 }}>
@@ -104,10 +106,16 @@ export default () => (
         agreeToTerms: false,
       }}
       onSubmit={(values, actions) => {
-        alert(JSON.stringify(values));
-        setTimeout(() => {
-          actions.setSubmitting(false);
-        }, 1000);
+        signUp({ email: values.email })
+          .then(() => {
+            alert(JSON.stringify(values.email));
+          })
+          .catch(error => {
+            actions.setFieldError('general', error.message);
+          })
+          .finally(() => {
+            actions.setSubmitting(false);
+          });
       }}
       validationSchema={validationSchema}
     >
@@ -143,9 +151,14 @@ export default () => (
             formikProps={formikProps}
           />
 
-          
-            <Button title="Submit" onPress={this.onDeneme(formikProps.values.email)} />
-          
+          {formikProps.isSubmitting ? (
+            <ActivityIndicator />
+          ) : (
+            <React.Fragment>
+              <Button title="Submit" onPress={formikProps.handleSubmit} />
+              <Text style={{ color: 'red' }}>{formikProps.errors.general}</Text>
+            </React.Fragment>
+          )}
         </React.Fragment>
       )}
     </Formik>

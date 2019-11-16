@@ -1,30 +1,64 @@
 import React, { Component } from 'react';
 import {
-    Image, StyleSheet, Dimensions, TouchableWithoutFeedback, ImageBackground, KeyboardAvoidingView, StatusBar, ToastAndroid
+    Image, StyleSheet, Dimensions, TouchableWithoutFeedback, ImageBackground, KeyboardAvoidingView, StatusBar, ToastAndroid, Text
 } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { Button, Block, Text, Input } from '../components';
+import { Button, Block, Input, Text as TextCmp } from '../components';
+import { requiredText, tcText, phoneRegExp, onlyText, onlyTextError } from '../constants/strings';
 import * as theme from '../constants/theme';
 import DatePicker from 'react-native-datepicker'
 
 
 
 const validationSchema = yup.object().shape({
-    name: yup
+    firstName: yup
+        .string().matches(onlyText, onlyTextError)
+        .label('firstName')
+        .min(2, 'En az 2 karakter girmelisiniz!')
+        .max(20, 'En fazla 20 karakter girebilirsiniz!')
+        .required(requiredText),
+    lastName: yup
+        .string().matches(onlyText, onlyTextError)
+        .label('lastNameName')
+        .min(2, 'En az 2 karakter girmelisiniz!')
+        .max(20, 'En fazla 20 karakter girebilirsiniz!')
+        .required(requiredText),
+    tcIdentityKey: yup
+        .number()
+        .label('tcIdentityKey')
+        .moreThan(9999999999, tcText)
+        .lessThan(100000000000, tcText)
+        .required(requiredText),
+    email: yup
         .string()
-        .required()
-        .label('Name')
-        .min(2, 'En az 2 karakter')
-        .max(5, 'max 5 karakter'),
+        .email("Lütfen geçerli bir email giriniz")
+        .label('email')
+        .required(requiredText),
+    phone: yup
+        .number()
+        .label('phone')
+        .moreThan(1000000000, phoneRegExp)
+        .lessThan(999999999999, phoneRegExp)
+        .required(requiredText),
+    password: yup
+        .string()
+        .label('password')
+        .min(1, 'En az 2 karakter girmelisiniz!')
+        .max(20, 'En fazla 20 karakter girebilirsiniz!')
+        .required(requiredText),
+    birthday: yup
+        .string()
+        .label('birthday')
+        .required(requiredText),
 });
 
 class Register extends Component {
     state = {
         active: null,
-        birthday: "1998-03-26",
+        birthday: '',
         firstName: '',
         surname: '',
         tcIdentityKey: 0,
@@ -42,26 +76,26 @@ class Register extends Component {
         StatusBar.setHidden(true);
     }
 
-    onChangeTextTc=(Tc,formikProps)=>{
+    onChangeTextTc = (Tc, formikProps) => {
         this.setState({
             tcIdentityKey: Tc
         });
-        formikProps.handleChange("name");
     }
 
-    onPress = () => {
+    onPress = (values) => {
+
 
         fetch('https://rugratswebapi.azurewebsites.net/api/register', {
             method: 'POST',
             body: JSON.stringify({
-                TcIdentityKey: this.state.tcIdentityKey,
-                userPassword: this.state.password,
-                userName: this.state.tcIdentityKey,
-                firstname: this.state.firstName,
-                surname: this.state.surname,
-                dateOfBirth: this.state.birthday,
-                phoneNumber: this.state.phone,
-                eMail: this.state.email
+                TcIdentityKey: values.tcIdentityKey,
+                userPassword: values.password,
+                userName: values.tcIdentityKey,
+                firstname: values.firstName,
+                surname: values.lastName,
+                dateOfBirth: values.birthday,
+                phoneNumber: values.phone,
+                eMail: values.email
             }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
@@ -80,8 +114,14 @@ class Register extends Component {
                 ToastAndroid.show("Kayıt Başarılı!", ToastAndroid.SHORT);
                 navigate('Login');
             }
-            else {
-                alert(deger);
+            else if(deger == "2") {
+                alert("Aynı emailde daha önce kayıt olmuş müşteri var!");
+            }
+            else if(deger == "3") {
+                alert("Aynı TCno'da daha önce kayıt olmuş kullanıcı var!");
+            }
+            else if(deger == "4") {
+                alert("18 yaşından küçükler kayıt olamaz!");
             }
         });
     };
@@ -116,126 +156,149 @@ class Register extends Component {
                 style={{ height: 18, width: 18 }}
             />
         );
-
+        let deger = '';
         return (
 
             <ImageBackground source={require('../assets/bgimage.jpg')} style={styles.backgroundImage}>
-                <Formik initialValues={{ name: '' }}
+                <Formik initialValues={{ firstName: '', lastName: '', tcIdentityKey: 0, phone: 0, email: '', birthday: '', password: '' }}
                     onSubmit={(values, actions) => {
-                        alert(JSON.stringify(values));
+                        //alert(JSON.stringify(values.firstName));
+                        this.onPress(values)
                         setTimeout(() => {
                             actions.setSubmitting(false);
                         }, 1000);
+                        
                     }}
+                    
                     validationSchema={validationSchema}>
-                        {formikProps => (
-                <KeyboardAwareScrollView style={{ marginVertical: 40 }} behavior="padding" enabled>
-                    <Block center middle style={{ marginBottom: 0, marginTop: 20 }}>
-                        <Image
-                            source={require('../assets/rgbank.png')}
-                            style={{ height: 120, width: 300 }}
-                        />
-                    </Block>
-                    <Block center>
-                        <Text h3 style={{ marginBottom: 6 }}>
-                            SIGN UP
-                    </Text>
+                    {formikProps => (
+                        <KeyboardAwareScrollView style={{ marginVertical: 40 }} behavior="padding" enabled>
+                            <Block center middle style={{ marginBottom: 0, marginTop: 20 }}>
+                                <Image
+                                    source={require('../assets/rgbank.png')}
+                                    style={{ height: 120, width: 300 }}
+                                />
+                            </Block>
+                            <Block center>
+                                <TextCmp h3 style={{ marginBottom: 6 }}>
+                                    KAYIT OL
+                             </TextCmp>
 
-                        <Block center style={{ marginTop: 25 }}>
-                            <Input
-                                full
-                                label="First Name"
-                                maxLength={20}
-                                autoCapitalize='sentences'
-                                style={{ marginBottom: 25 }}
-                                onChangeText={(firstName) => { this.setState({ firstName: firstName }) }}
-                            />
-                            <Input
-                                full
-                                label="Last Name"
-                                maxLength={20}
-                                autoCapitalize='sentences'
-                                style={{ marginBottom: 25 }}
-                                onChangeText={(surname) => { this.setState({ surname: surname }) }}
-                            />
-                            <Input
-                                full
-                                label="Tc Identity Key"
-                                number
-                                maxLength={11}
-                                style={{ marginBottom: 25 }}
-                                onChangeText={(tcIdentityKey) => { this.setState({ tcIdentityKey: tcIdentityKey }) }}
-                            />
-                            <Input
-                                full
-                                email
-                                label="Email address"
-                                maxLength={30}
-                                style={{ marginBottom: 25 }}
-                                onChangeText={(email) => { this.setState({ email: email }) }}
-                            />
-                            <Input
-                                full
-                                phone
-                                label="Phone"
-                                maxLength={16}
-                                style={{ marginBottom: 25 }}
-                                onChangeText={(phone) => { this.setState({ phone: phone }) }}
-                            />
-                            <Text style={{ marginBottom: 10 }}>
-                                Birthday</Text>
-                            <DatePicker
-                                style={{ width: 200, marginLeft: 0, marginBottom: 20 }}
-                                date={this.state.birthday}
-                                mode="date"
-                                placeholder="select date"
-                                format="YYYY-MM-DD"
-                                minDate="1916-05-01"
-                                maxDate="2001-11-15"
-                                confirmBtnText="Confirm"
-                                cancelBtnText="Cancel"
-                                customStyles={{
-                                    dateIcon: {
-                                        position: 'absolute',
-                                        left: 0,
-                                        top: 4,
-                                        marginLeft: 0
-                                    },
-                                    dateInput: {
-                                        marginLeft: 36
-                                    }
-                                    // ... You can check the source to find the other keys.
-                                }}
-                                onDateChange={(date) => { this.setState({ birthday: date }) }}
-                            />
-                            <Input
-                                full
-                                password
-                                label="Password"
-                                maxLength={30}
-                                style={{ marginBottom: 25 }}
-                                onChangeText={(password) => { this.setState({ password: password }) }}
-                            />
-
-                            <Button
-                                full
-                                style={{ marginBottom: 12 }}
-                                onPress={this.onPress}
-                            >
-                                <Text button>Sign Up</Text>
-                            </Button>
-                            <Text paragraph color="gray">
-                                Already have an account? <Text
-                                    height={18}
-                                    color="blue"
-                                    onPress={() => navigation.navigate('Login')}>
-                                    Sign in
-                        </Text>
-                            </Text>
-                        </Block>
-                    </Block>
-                </KeyboardAwareScrollView>
-                        )}
+                                <Block center style={{ marginTop: 25 }}>
+                                    <Input
+                                        full
+                                        label="İsim"
+                                        maxLength={20}
+                                        autoCapitalize='sentences'
+                                        style={{ marginBottom: 5 }}
+                                        onChangeText={formikProps.handleChange("firstName")}
+                                    />
+                                    <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.firstName}
+                                    </Text>
+                                    <Input
+                                        full
+                                        label="Soyisim"
+                                        maxLength={20}
+                                        autoCapitalize='sentences'
+                                        style={{ marginBottom: 5 }}
+                                        onChangeText={formikProps.handleChange("lastName")}
+                                    />
+                                    <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.lastName}
+                                    </Text>
+                                    <Input
+                                        full
+                                        label="Tc Kimlik No"
+                                        number
+                                        maxLength={11}
+                                        style={{ marginBottom: 5 }}
+                                        onChangeText={formikProps.handleChange("tcIdentityKey")}
+                                    />
+                                    <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.tcIdentityKey}
+                                    </Text>
+                                    <Input
+                                        full
+                                        email
+                                        label="Email"
+                                        maxLength={30}
+                                        style={{ marginBottom: 5 }}
+                                        onChangeText={formikProps.handleChange("email")}
+                                    />
+                                    <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.email}
+                                    </Text>
+                                    <Input
+                                        full
+                                        phone
+                                        label="Telefon"
+                                        maxLength={16}
+                                        style={{ marginBottom: 5 }}
+                                        onChangeText={formikProps.handleChange("phone")}
+                                    />
+                                    <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.phone}
+                                    </Text>
+                                    <Text style={{ marginBottom: 2 }}>
+                                        Doğum Günü</Text>
+                                    <DatePicker
+                                        style={{ width: 200, marginLeft: 0, marginBottom: 5 }}
+                                        date={formikProps.values.birthday}
+                                        mode="date"
+                                        placeholder="Tarih Seçiniz"
+                                        format="YYYY-MM-DD"
+                                        minDate="1916-05-01"
+                                        maxDate="2001-11-15"
+                                        confirmBtnText="Confirm"
+                                        cancelBtnText="Cancel"
+                                        customStyles={{
+                                            dateIcon: {
+                                                position: 'absolute',
+                                                left: 0,
+                                                top: 4,
+                                                marginLeft: 0
+                                            },
+                                            dateInput: {
+                                                marginLeft: 36
+                                            }
+                                            // ... You can check the source to find the other keys.
+                                        }}
+                                        onDateChange={formikProps.handleChange("birthday")}
+                                    />
+                                    <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.birthday}
+                                    </Text>
+                                    <Input
+                                        full
+                                        password
+                                        label="Şifre"
+                                        maxLength={30}
+                                        style={{ marginBottom: 5 }}
+                                        onChangeText={formikProps.handleChange("password")}
+                                    />
+                                    <Text style={{ color: 'red', marginBottom: 2 }}>
+                                        {formikProps.errors.password}
+                                    </Text>
+                                    <Button
+                                        full
+                                        style={{ marginBottom: 12 }}
+                                        onPress={formikProps.handleSubmit}
+                                    >
+                                        <TextCmp button >Kayıt Ol</TextCmp>
+                                    </Button>
+                                    <TextCmp paragraph color="gray">
+                                        Zaten bir hesabın var mı? <TextCmp
+                                            height={18}
+                                            color="blue"
+                                            onPress={() => navigation.navigate('Login')}>
+                                            Giriş yap
+                                            </TextCmp>
+                                    </TextCmp>
+                                </Block>
+                            </Block>
+                        </KeyboardAwareScrollView>
+                    )}
                 </Formik>
             </ImageBackground>
         )
