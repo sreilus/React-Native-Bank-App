@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import {
-    Image, StyleSheet, Dimensions, TouchableWithoutFeedback, ImageBackground,Text
+    Image, StyleSheet, Dimensions, TouchableWithoutFeedback, ImageBackground,Text,ToastAndroid
 } from 'react-native';
-
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { Button, Block, Text as TextCmp, Input } from '../components';
@@ -27,7 +26,7 @@ const validationSchema = yup.object().shape({
 });
 
 
-class Login extends Component {
+class Login extends React.Component {
     state = {
         active: null,
         tcIdentityKey: 0,
@@ -66,7 +65,7 @@ class Login extends Component {
             const { navigate } = this.props.navigation;
 
             if (deger == "1") {
-                navigate('Home', { tcNumber: values.tcIdentityKey });
+                navigate('List', { tcNumber: values.tcIdentityKey });
                 ToastAndroid.show("Giriş Başarılı!", ToastAndroid.SHORT);
             }
             else {
@@ -122,9 +121,9 @@ class Login extends Component {
                         />
                     </Block>
                     <Block center>
-                        <Text h3 style={{ marginBottom: 6 }}>
+                        <TextCmp h3 style={{ marginBottom: 6 }}>
                             GİRİŞ YAP
-                    </Text>
+                    </TextCmp>
 
                         <Block center style={{ marginTop: 25 }}>
                             <Input
@@ -133,6 +132,7 @@ class Login extends Component {
                                 number
                                 maxLength={11}
                                 style={{ marginBottom: 5 }}
+                                defaultValue='11111111111' 
                                 onChangeText={formikProps.handleChange("tcIdentityKey")}
                             />
                             <Text style={{ color: 'red', marginBottom: 2 }}>
@@ -144,6 +144,7 @@ class Login extends Component {
                                 label="Şİfre"
                                 maxLength={30}
                                 style={{ marginBottom: 5 }}
+                                defaultValue='1' 
                                 onChangeText={formikProps.handleChange("password")}
                             />
                             <Text style={{ color: 'red', marginBottom: 2 }}>
@@ -154,13 +155,13 @@ class Login extends Component {
                                 style={{ marginBottom: 12 }}
                                 onPress={formikProps.handleSubmit}
                             >
-                                <Text button>Giriş Yap</Text>
+                                <TextCmp button>Giriş Yap</TextCmp>
                             </Button>
                             <TextCmp paragraph color="gray">
                                 Kayıtlı değil misin? <TextCmp
                                     height={18}
                                     color="blue"
-                                    onPress={() => navigation.navigate('Deneme')}>
+                                    onPress={() => navigation.navigate('Register')}>
                                     Kayıt Ol
                             </TextCmp>
                             </TextCmp>

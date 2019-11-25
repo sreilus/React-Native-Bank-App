@@ -10,6 +10,8 @@ import Index from '../React-Native-Bank-App/app/index';
 import HomeScreen from '..//React-Native-Bank-App/Screens/HomeScreen';
 import Register from '..//React-Native-Bank-App/Screens/Register';
 import AppNavigator from './AppNavigator';
+import DrawNavigator from './DrawNavigator';
+
 
 function cacheImages(images) {
   return images.map(image => {
@@ -34,7 +36,7 @@ export default class App extends React.Component {
       isReady: false
     };
 
-    createAppContainer(MainNavigator);
+    createAppContainer(AppNavigator);
   }
 
   async _loadAssetsAsync() {
@@ -53,7 +55,7 @@ export default class App extends React.Component {
         />
       );
     }
-    return <AppNavigator/>;
+    return <DrawNavigator/>;
   }
 }
 const styles = StyleSheet.create({

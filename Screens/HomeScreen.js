@@ -10,7 +10,7 @@ import {
   FlatList,
   ListView,
   BackHandler,
-  Alert
+  Alert,
 } from 'react-native';
 
 renderRow = ({ item }) => {
@@ -38,6 +38,8 @@ class HomeScreen extends React.Component {
 
   componentDidMount = () => {
     BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
+    if(this.state.tcNumber!==null)
+    {
     console.log('tc: ' + this.state.tcNumber)
     let url='https://rugratswebapi.azurewebsites.net/api/account/'+this.state.tcNumber;
     console.log('url: '+url)
@@ -63,6 +65,7 @@ class HomeScreen extends React.Component {
       .catch((error) => {
         console.error(error);
       });
+    }
   }
 
   componentWillUnmount() {
@@ -96,7 +99,9 @@ class HomeScreen extends React.Component {
         <View style={styles.container}>
           <FlatList
             data={this.state.accounts}
-            renderItem={({ item }) => <Text style={styles.item}>{item.accountNo}</Text>}
+            key={({item}) => item.accountNo}
+            renderItem={({ item }) => <Text style={styles.item}>{key}
+            </Text>}
           />
         </View>
       );
@@ -110,7 +115,8 @@ class HomeScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    marginTop:50
   },
   item: {
     backgroundColor: '#f9c2ff',
