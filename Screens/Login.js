@@ -153,7 +153,7 @@ class Login extends React.Component {
                             <Button
                                 full
                                 style={{ marginBottom: 12 }}
-                                onPress={formikProps.handleSubmit}
+                                onPress={() => navigation.navigate('List')}
                             >
                                 <TextCmp button>Giriş Yap</TextCmp>
                             </Button>

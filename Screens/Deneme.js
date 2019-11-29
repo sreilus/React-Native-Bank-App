@@ -85,45 +85,45 @@ class Register extends Component {
     onPress = (values) => {
 
 
-        fetch('https://rugratswebapi.azurewebsites.net/api/register', {
-            method: 'POST',
-            body: JSON.stringify({
-                TcIdentityKey: values.tcIdentityKey,
-                userPassword: values.password,
-                userName: values.tcIdentityKey,
-                firstname: values.firstName,
-                surname: values.lastName,
-                dateOfBirth: values.birthday,
-                phoneNumber: values.phone,
-                eMail: values.email
-            }),
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        }).then(response => {
-            return response.json()
-        }).then(json => {
-            this.setState({
-                resultt: json
-            });
-            console.log(this.state.resultt);
-            let deger = '' + this.state.resultt;
+        // fetch('https://rugratswebapi.azurewebsites.net/api/register', {
+        //     method: 'POST',
+        //     body: JSON.stringify({
+        //         TcIdentityKey: values.tcIdentityKey,
+        //         userPassword: values.password,
+        //         userName: values.tcIdentityKey,
+        //         firstname: values.firstName,
+        //         surname: values.lastName,
+        //         dateOfBirth: values.birthday,
+        //         phoneNumber: values.phone,
+        //         eMail: values.email
+        //     }),
+        //     headers: {
+        //         "Content-type": "application/json; charset=UTF-8"
+        //     }
+        // }).then(response => {
+        //     return response.json()
+        // }).then(json => {
+        //     this.setState({
+        //         resultt: json
+        //     });
+        //     console.log(this.state.resultt);
+        //     let deger = '' + this.state.resultt;
             const { navigate } = this.props.navigation;
 
-            if (deger == "1") {
-                ToastAndroid.show("Kayıt Başarılı!", ToastAndroid.SHORT);
+            // if (deger == "1") {
+            //     ToastAndroid.show("Kayıt Başarılı!", ToastAndroid.SHORT);
                 navigate('Login');
-            }
-            else if(deger == "2") {
-                alert("Aynı emailde daha önce kayıt olmuş müşteri var!");
-            }
-            else if(deger == "3") {
-                alert("Aynı TCno'da daha önce kayıt olmuş kullanıcı var!");
-            }
-            else if(deger == "4") {
-                alert("18 yaşından küçükler kayıt olamaz!");
-            }
-        });
+        //     }
+        //     else if(deger == "2") {
+        //         alert("Aynı emailde daha önce kayıt olmuş müşteri var!");
+        //     }
+        //     else if(deger == "3") {
+        //         alert("Aynı TCno'da daha önce kayıt olmuş kullanıcı var!");
+        //     }
+        //     else if(deger == "4") {
+        //         alert("18 yaşından küçükler kayıt olamaz!");
+        //     }
+        // });
     };
 
 

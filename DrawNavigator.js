@@ -4,7 +4,11 @@ import { createAppContainer } from "react-navigation";
 import { createDrawerNavigator } from "react-navigation-drawer";
 import { createStackNavigator } from 'react-navigation-stack';
 
-import { Dimensions } from "react-native";
+import {
+    Dimensions,
+    SafeAreaView,
+    Button
+} from "react-native";
 
 import { Feather, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 
@@ -24,6 +28,8 @@ import Home from "./Screens/HomeScreen";
 
 import Register from "./Screens/Deneme";
 
+import SignOut from "./Screens/SignOut";
+
 import Hidden from "./Screens/Hidden";
 
 import SideBar from "./components/SideBar";
@@ -37,8 +43,8 @@ const LoginStack = createStackNavigator(
 );
 
 LoginStack.navigationOptions = ({ navigation }) => {
-    
-       let drawerLockMode = 'locked-closed';
+
+    let drawerLockMode = 'locked-closed';
     return {
         drawerLockMode,
     };
@@ -53,30 +59,29 @@ const RegisterStack = createStackNavigator(
 );
 
 RegisterStack.navigationOptions = ({ navigation }) => {
-    
-       let drawerLockMode = 'locked-closed';
+
+    let drawerLockMode = 'locked-closed';
     return {
         drawerLockMode,
     };
 };
 
 const DrawerNavigator = createDrawerNavigator(
-    {Login: {
-        screen: LoginStack,
-        navigationOptions: {
-            title: "EmptyScr",
-            drawerLabel: <Hidden />
-        }
-    },
+    {
+        Login: {
+            screen: LoginStack,
+            navigationOptions: {
+                title: "EmptyScr",
+                drawerLabel: <Hidden />
+            }
+        },
         Register: {
-        screen: RegisterStack,
-        navigationOptions: {
-            title: "RegstScr",
-            drawerLabel: <Hidden />
-        }
-    },
-        
-        
+            screen: RegisterStack,
+            navigationOptions: {
+                title: "RegstScr",
+                drawerLabel: <Hidden />
+            }
+        },
         Profil: {
             screen: ProfileScreen,
             navigationOptions: {
@@ -126,19 +131,20 @@ const DrawerNavigator = createDrawerNavigator(
             }
         },
         SignOut: {
-            screen: SignOutScreen,
+            screen: SignOut,
             navigationOptions: {
                 title: "Sign Out",
                 drawerIcon: ({ tintColor }) => <Feather name="log-out" size={16} color={tintColor} />
-            }
+            },
         }
     },
     {
         contentComponent: props => <SideBar {...props} />,
 
-        drawerWidth: Dimensions.get("window").width * 0.65,
+        drawerWidth: Dimensions.get("window").width * 0.6,
         hideStatusBar: true,
 
+        initialRouteName: 'List',
         contentOptions: {
             activeBackgroundColor: "rgba(212,118,207, 0.2)",
             activeTintColor: "#53115B",
