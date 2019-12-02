@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Image, StyleSheet, Dimensions, TouchableWithoutFeedback, ImageBackground,Text,ToastAndroid
+    Image, StyleSheet, AsyncStorage, ImageBackground,Text,ToastAndroid
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -41,6 +41,13 @@ class Login extends React.Component {
     handleType = id => {
         const { active } = this.state;
         this.setState({ active: active === id ? null : id });
+    }
+
+    _login = async()=>{
+        
+        await AsyncStorage.setItem('isLoggedIn','1');
+        this.props.navigation.navigate('List');
+        ToastAndroid.show("Giriş Yapıldı!",ToastAndroid.SHORT);
     }
 
     onPress = (values) => {
@@ -153,7 +160,7 @@ class Login extends React.Component {
                             <Button
                                 full
                                 style={{ marginBottom: 12 }}
-                                onPress={() => navigation.navigate('List')}
+                                onPress={this._login}
                             >
                                 <TextCmp button>Giriş Yap</TextCmp>
                             </Button>

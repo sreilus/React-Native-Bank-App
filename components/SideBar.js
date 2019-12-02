@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, ImageBackground, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ImageBackground, Image, AsyncStorage } from "react-native";
 import { DrawerNavigatorItems } from "react-navigation-drawer";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -10,7 +10,7 @@ export default SideBar = props => (
             style={{ width: undefined, padding: 16, paddingTop: 48 }}
         >
             <Image source={require("../assets/profile-pic.jpg")} style={styles.profile} />
-            <Text style={styles.name}>Sophie Stewart</Text>
+            <Text style={styles.name}>{AsyncStorage.getItem("isLoggedIn") === '1'? 'oldu' : 'olmadı'}</Text>
 
             <View style={{ flexDirection: "row" }}>
                 <Text style={styles.followers}>734 Followers</Text>

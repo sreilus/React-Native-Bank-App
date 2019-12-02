@@ -1,13 +1,16 @@
 import React from "react";
 
-import { createAppContainer } from "react-navigation";
+import { createAppContainer,createSwitchNavigator } from "react-navigation";
 import { createDrawerNavigator } from "react-navigation-drawer";
 import { createStackNavigator } from 'react-navigation-stack';
 
 import {
     Dimensions,
-    SafeAreaView,
-    Button
+    View,
+    ActivityIndicator,
+    StatusBar,
+    StyleSheet,
+    AsyncStorage
 } from "react-native";
 
 import { Feather, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
@@ -65,6 +68,29 @@ RegisterStack.navigationOptions = ({ navigation }) => {
         drawerLockMode,
     };
 };
+
+const AuthStack = createStackNavigator({Login: LoginStack });
+
+class AuthLoadingScreen extends React.Component {
+    constructor(props) {
+        super(props);
+        this._loadData();
+    }
+
+    render() {
+        return(
+            <View style={styles.container}>
+                <ActivityIndicator/>
+                <StatusBar barStyle="default"/>
+            </View>
+        );
+    }
+
+    _loadData = async() => {
+        const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+        this.props.navigation.navigate(isLoggedIn !== '1'? 'Auth' : 'App')
+    }
+}
 
 const DrawerNavigator = createDrawerNavigator(
     {
@@ -126,7 +152,7 @@ const DrawerNavigator = createDrawerNavigator(
         Statistic: {
             screen: StatisticScreen,
             navigationOptions: {
-                title: "Hgs İşlemlerie",
+                title: "Hgs İşlemleri",
                 drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="highway" size={16} color={tintColor} />
             }
         },
@@ -139,7 +165,8 @@ const DrawerNavigator = createDrawerNavigator(
         }
     },
     {
-        contentComponent: props => <SideBar {...props} />,
+        
+        contentComponent: props => <SideBar { ...props} />,
 
         drawerWidth: Dimensions.get("window").width * 0.6,
         hideStatusBar: true,
@@ -159,4 +186,24 @@ const DrawerNavigator = createDrawerNavigator(
     }
 );
 
-export default createAppContainer(DrawerNavigator);
+export default createAppContainer(
+    createSwitchNavigator(
+      {
+        AuthLoading: AuthLoadingScreen,
+        App: DrawerNavigator,
+        Auth: LoginStack,
+      },
+      {
+        initialRouteName: 'AuthLoading',
+      }
+    )
+  );
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#1e90ff',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }
+  });

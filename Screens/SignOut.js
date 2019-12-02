@@ -3,7 +3,9 @@ import {
     Text,
     View,
     Alert,
-    Button
+    Button,
+    AsyncStorage,
+    ToastAndroid
 } from 'react-native'
 
 onBackPress = () => {
@@ -26,36 +28,42 @@ onBackPress = () => {
 
 export default class SignOut extends Component {
 
-
     onBackPress = () => {
         Alert.alert(
-            'Confirm exit',
-            'Do you want to exit App?',
+            'Çıkış Yap',
+            'Çıkış Yapmak İstiyor Musunuz?',
             [
-                { text: 'CANCEL', style: 'cancel'},
+                { text: 'Hayır', style: 'cancel' },
                 {
-                    text: 'OK', onPress: () => {
-                        const { navigate } = this.props.navigation;
-                        navigate('Login');
+                    text: 'Evet', onPress: () => {
+                        this._logOut();
                     }
                 }
             ]
         );
-    
+
         return true;
     }
 
     componentWillMount = () => {
-        this.onBackPress()
+        //this.onBackPress()
     };
+
+    _logOut = async () => {
+        await AsyncStorage.removeItem("isLoggedIn");
+        ToastAndroid.show("Çıkış Yapıldı!",ToastAndroid.SHORT);
+        this.props.navigation.navigate("Login");
+    }
 
     render() {
         return (
-            <View style={{ flex:1,
-                flexDirection:'row',
-                alignItems:'center',
-                justifyContent:'center'}}>
-                <Button title="Oturumu Kapat"  onPress={()=> this.props.navigation.navigate("Login")}></Button>
+            <View style={{
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <Button title="Oturumu Kapat" onPress={this.onBackPress}></Button>
             </View>
         )
     }

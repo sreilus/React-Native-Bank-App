@@ -25,7 +25,7 @@ renderRow = ({ item }) => {
   )
 }
 
-var data = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+//var data = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 class HomeScreen extends React.Component {
 
@@ -117,7 +117,7 @@ class HomeScreen extends React.Component {
               }}>
 
                 <View style={styles.item}>
-                  <Text >ID: {item.accountNo}</Text>
+                  <Text >Hesap No: {item.accountNo}</Text>
                   <Button title="Detaylar" onPress={() => alert(item.accountNo)}></Button>
                   <Button title="Kapat" onPress={() => alert(item.accountNo)}></Button>
                 </View>
