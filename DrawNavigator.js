@@ -61,6 +61,14 @@ const RegisterStack = createStackNavigator(
     }
 );
 
+const ListAccounts = createStackNavigator(
+    {
+        List: {
+            screen: Home,
+        }
+    }
+);
+
 RegisterStack.navigationOptions = ({ navigation }) => {
 
     let drawerLockMode = 'locked-closed';
@@ -88,7 +96,8 @@ class AuthLoadingScreen extends React.Component {
 
     _loadData = async() => {
         const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
-        this.props.navigation.navigate(isLoggedIn !== '1'? 'Auth' : 'App')
+        console.log("girddiiii")
+        this.props.navigation.navigate(isLoggedIn >= '0'? 'Auth' : 'App')
     }
 }
 
@@ -159,7 +168,7 @@ const DrawerNavigator = createDrawerNavigator(
         SignOut: {
             screen: SignOut,
             navigationOptions: {
-                title: "Sign Out",
+                title: "Çıkış Yap",
                 drawerIcon: ({ tintColor }) => <Feather name="log-out" size={16} color={tintColor} />
             },
         }

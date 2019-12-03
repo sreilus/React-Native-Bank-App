@@ -27,10 +27,15 @@ const validationSchema = yup.object().shape({
 
 
 class Login extends React.Component {
+    
     state = {
         active: null,
         tcIdentityKey: 0,
         password: ''
+    }
+    
+    componentDidMount(){
+        
     }
 
     static navigationOptions = {
@@ -50,9 +55,9 @@ class Login extends React.Component {
         ToastAndroid.show("Giriş Yapıldı!",ToastAndroid.SHORT);
     }
 
-    onPress = (values) => {
+    onPress = async(values) => {
         console.log(values);
-        fetch('https://rugratswebapi.azurewebsites.net/api/login', {
+        await fetch('https://rugratswebapi.azurewebsites.net/api/login', {
             method: 'POST',
             body: JSON.stringify({
                 TcIdentityKey: values.tcIdentityKey,
@@ -72,6 +77,8 @@ class Login extends React.Component {
             const { navigate } = this.props.navigation;
 
             if (deger == "1") {
+                AsyncStorage.setItem('isLoggedIn',values.tcIdentityKey);
+                this.setTcNo(values.tcIdentityKey);
                 navigate('List', { tcNumber: values.tcIdentityKey });
                 ToastAndroid.show("Giriş Başarılı!", ToastAndroid.SHORT);
             }
@@ -139,7 +146,7 @@ class Login extends React.Component {
                                 number
                                 maxLength={11}
                                 style={{ marginBottom: 5 }}
-                                defaultValue='11111111111' 
+                                //defaultValue='11111111111' 
                                 onChangeText={formikProps.handleChange("tcIdentityKey")}
                             />
                             <Text style={{ color: 'red', marginBottom: 2 }}>
@@ -151,7 +158,7 @@ class Login extends React.Component {
                                 label="Şİfre"
                                 maxLength={30}
                                 style={{ marginBottom: 5 }}
-                                defaultValue='1' 
+                                //defaultValue='1' 
                                 onChangeText={formikProps.handleChange("password")}
                             />
                             <Text style={{ color: 'red', marginBottom: 2 }}>
@@ -160,7 +167,7 @@ class Login extends React.Component {
                             <Button
                                 full
                                 style={{ marginBottom: 12 }}
-                                onPress={this._login}
+                                onPress={formikProps.handleSubmit}
                             >
                                 <TextCmp button>Giriş Yap</TextCmp>
                             </Button>

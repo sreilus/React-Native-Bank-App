@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -12,7 +12,8 @@ import {
   ListView,
   Button,
   TouchableHighlight,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  AsyncStorage,
 } from 'react-native';
 import { Dimensions } from "react-native";
 
@@ -25,7 +26,6 @@ renderRow = ({ item }) => {
   )
 }
 
-//var data = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 class HomeScreen extends React.Component {
 
@@ -33,19 +33,18 @@ class HomeScreen extends React.Component {
     super(props);
     const { navigation } = this.props;
     this.state = {
-      accounts: [],
+      accounts: [{accountNo:555, balance:50}],
       isLoading: true,
-      tcNumber: (navigation.getParam('tcNumber', 'NO-ID'))
+      tcNumber: (navigation.getParam('tcNumber', 'NO-ID')),
+      result: 0
     };
   }
 
-
-  componentDidMount = () => {
-    BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
+  listAccounts = () => {
     this.setState({
       isLoading: false
-    })
-    /*if (this.state.tcNumber !== null) {
+    });
+    if (this.state.tcNumber !== null) {
       console.log('tc: ' + this.state.tcNumber)
       let url = 'https://rugratswebapi.azurewebsites.net/api/account/' + this.state.tcNumber;
       console.log('url: ' + url)
@@ -71,21 +70,142 @@ class HomeScreen extends React.Component {
         .catch((error) => {
           console.error(error);
         });
-    }*/
+    }
+    else {
+      Alert.alert("Lütfen Giriş Yapınız!");
+    }
+  }
+
+  componentWillMount() {
+    console.log('ccccc:  '+AsyncStorage.getItem('isLoggedIn'))
+    let deger=AsyncStorage.getItem('isLoggedIn')
+    if(!(deger >0))
+    {
+      console.log('ife girdi');
+      AsyncStorage.removeItem("isLoggedIn");
+    }
+  }
+
+  componentDidMount = () => {
+    {console.log('ddddd:  '+AsyncStorage.getItem('isLoggedIn'))}
+    BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
+    this.setState({
+      tcNumber: this.props.navigation.getParam('tcNumber', 'NO-ID')
+    });
+    this.listAccounts();
   }
 
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
   }
 
+  closeAnAccount = async (accountNo) => {
+    if (this.state.tcNumber !== null) {
+      console.log('tc: ' + this.state.tcNumber)
+      let url = 'https://rugratswebapi.azurewebsites.net/api/account/closeAccount';
+      console.log('url: ' + url)
+      this.setState({
+        isLoading: true
+      })
+      await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          accountNo: accountNo,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      }).then(response => {
+        return response.json()
+      }).then(json => {
+        this.setState({
+          result: json
+        });
+        console.log(this.state.result);
+
+      }).finally(() => {
+        this.setState({
+          isLoading: false
+        });
+        let deger = '' + this.state.result;
+        if (deger == "1") {
+          Alert.alert("Hesap Başarıyla Kapatıldı!");
+          this.listAccounts();
+        }
+        else if (deger == "2") {
+          Alert.alert("Hesabınızda Para Olduğu İçin Hesap Kapatılamadı!");
+        }
+        else {
+          console.log("kapatt : " + deger)
+          alert("Hesap Kapatma İşlemi Başarısız Oldu!");
+        }
+        // console.log("finally " + this.state.accounts[0].accountNo)
+      })
+        .catch((error) => {
+          console.error(error);
+        });;
+    }
+    else {
+      Alert.alert("Lütfen Giriş Yapınız!");
+    }
+  }
+
+
+  openAnAccount = async () => {
+    if (this.state.tcNumber !== null) {
+      console.log('tc: ' + this.state.tcNumber)
+      let url = 'https://rugratswebapi.azurewebsites.net/api/account/openAnAccount';
+      console.log('url: ' + url)
+      this.setState({
+        isLoading: true
+      })
+      await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          TcIdentityKey: this.state.tcNumber,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      }).then(response => {
+        return response.json()
+      }).then(json => {
+        this.setState({
+          result: json
+        });
+        console.log(this.state.result);
+
+      }).finally(() => {
+        this.setState({
+          isLoading: false
+        });
+        let deger = '' + this.state.result;
+        if (deger == "1") {
+          Alert.alert("Hesap Başarıyla Açıldı!");
+          this.listAccounts();
+        }
+        else {
+          alert("Kimlik No veya Şifre Hatalı!");
+        }
+        // console.log("finally " + this.state.accounts[0].accountNo)
+      })
+        .catch((error) => {
+          console.error(error);
+        });;
+    }
+    else {
+      Alert.alert("Lütfen Giriş Yapınız!");
+    }
+  }
+
   onBackPress = () => {
     Alert.alert(
-      'Confirm exit',
-      'Do you want to exit App?',
+      'Uygulammayı Kapat',
+      'Uygulamadan Çıkmak İstiyor Musunuz?',
       [
-        { text: 'CANCEL', style: 'cancel' },
+        { text: 'Hayır', style: 'cancel' },
         {
-          text: 'OK', onPress: () => {
+          text: 'EVet', onPress: () => {
             BackHandler.exitApp()
           }
         }
@@ -100,15 +220,13 @@ class HomeScreen extends React.Component {
   };
   render() {
     if (this.state.isLoading === false) {
-      { console.log("ife girdi" + this.state.isLoading) }
-      { console.log("ife girdi--" + this.state.accounts) }
       return (
         <View style={styles.container}>
-          <Text style={{marginTop:5,marginBottom:5, fontSize:18,marginLeft: Dimensions.get("window").width * 0.38}}>Hesap Listesi</Text>
-          <Button title="Hesap Aç" onPress={() => alert("Hesap Açıldı")} style={{ marginBottom: 50, marginLeft: 100, marginRight: 100, }}></Button>
+          <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Hesap Listesi</Text>
+          <Button title="Hesap Aç" onPress={this.openAnAccount} style={{ marginBottom: 50, marginLeft: 100, marginRight: 100, }}></Button>
 
           <FlatList
-            data={[{ accountNo: "3211321" }, { accountNo: "555555" }]}
+            data={this.state.accounts}
             renderItem={({ item }) =>
 
               <TouchableWithoutFeedback style={{
@@ -116,10 +234,17 @@ class HomeScreen extends React.Component {
                 justifyContent: 'space-between',
               }}>
 
-                <View style={styles.item}>
+                <View style={styles.view}>
                   <Text >Hesap No: {item.accountNo}</Text>
-                  <Button title="Detaylar" onPress={() => alert(item.accountNo)}></Button>
-                  <Button title="Kapat" onPress={() => alert(item.accountNo)}></Button>
+                  <Text >Para Miktarı: {item.balance} ₺</Text>
+                  <View style={styles.item}>
+                    <Button title="Detaylar" onPress={() => this.setState({
+                      tcNumber: this.props.navigation.getParam('tcNumber', 'NO-ID')
+                    })}></Button>
+                  </View>
+                  <View style={styles.item}>
+                    <Button title="Hesabı Kapat" onPress={() => this.closeAnAccount(item.accountNo)}></Button>
+                  </View>
                 </View>
 
               </TouchableWithoutFeedback>
@@ -130,7 +255,8 @@ class HomeScreen extends React.Component {
     }
     return (
       <View>
-        <Text>Hesaplar Yükleniyor...</Text>
+         {console.log('hhhhhhh:  '+AsyncStorage.getItem('isLoggedIn'))}
+        <Text style={{ marginTop: 25 }}>Yükleniyor Lütfen Bekleyiniz...</Text>
       </View>)
   }
 }
@@ -138,15 +264,23 @@ class HomeScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 50
+    marginTop: 20
   },
-  item: {
-    backgroundColor: 'gray',
+  view: {
+    backgroundColor: '#cfcfcf',
+    borderRadius: 50,
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-around'
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+  item: {
+    backgroundColor: 'gray',
+    marginVertical: 8,
+    marginHorizontal: 16,
+    flexDirection: 'column',
+    justifyContent: 'center'
   },
   title: {
     fontSize: 32,

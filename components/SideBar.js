@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, ImageBackground, Image, AsyncStorag
 import { DrawerNavigatorItems } from "react-navigation-drawer";
 import { Ionicons } from "@expo/vector-icons";
 
+
+
 export default SideBar = props => (
     <ScrollView>
         <ImageBackground
@@ -10,12 +12,12 @@ export default SideBar = props => (
             style={{ width: undefined, padding: 16, paddingTop: 48 }}
         >
             <Image source={require("../assets/profile-pic.jpg")} style={styles.profile} />
-            <Text style={styles.name}>{AsyncStorage.getItem("isLoggedIn") === '1'? 'oldu' : 'olmadı'}</Text>
+            <Text style={styles.name}>Rugrats Bank</Text>
 
-            <View style={{ flexDirection: "row" }}>
+            {/* <View style={{ flexDirection: "row" }}>
                 <Text style={styles.followers}>734 Followers</Text>
                 <Ionicons name="md-people" size={16} color="rgba(255, 255, 255, 0.8)" />
-            </View>
+            </View> */}
         </ImageBackground>
 
         <View style={styles.container} forceInset={{ top: "always", horizontal: "never" }}>

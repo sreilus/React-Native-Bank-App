@@ -14,7 +14,7 @@ export default class Screen extends React.Component {
                         <FontAwesome5 name="bars" size={24} color="#161924" />
                     </TouchableOpacity>
                     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                        <Text style={styles.text}>{this.props.name} Screen</Text>
+                        <Text style={styles.text}>Coming Soon</Text>
                     </View>
                 </SafeAreaView>
             </View>
