@@ -36,12 +36,22 @@ class HomeScreen extends React.Component {
       isLoading: true,
       tcNumber: (navigation.getParam('tcNumber', 'NO-ID')),
       result: 0,
-      isDialogVisible:false,
-      selectedAccountNo:0
+      isDialogVisible: false,
+      selectedAccountNo: 0,
+      isFetching: false,
     };
   }
 
-  listAccounts = () => {
+  onRefresh = async() =>{
+    this.setState({
+      isFetching: true,
+      tcNumber: this.give()
+    });
+    console.log("tccc: "+this.state.tcNumber)
+    this.listAccounts();
+  }
+
+  listAccounts = async () => {
     this.setState({
       isLoading: false
     });
@@ -52,7 +62,7 @@ class HomeScreen extends React.Component {
       this.setState({
         isLoading: true
       })
-      fetch(url)
+      await fetch(url)
         .then((response) => response.json())
         .then((responseJson) => {
           //console.log(responseJson);
@@ -75,6 +85,7 @@ class HomeScreen extends React.Component {
     else {
       Alert.alert("Lütfen Giriş Yapınız!");
     }
+    this.setState({ isFetching: false })
   }
 
   componentWillMount() {
@@ -86,9 +97,11 @@ class HomeScreen extends React.Component {
     }
   }
 
-  give = async () =>{
-    const deger= await AsyncStorage.getItem('TcNo');
-    { console.log('ddddd:  ' + deger) }
+  give = async () => {
+    let deger = await AsyncStorage.getItem('TcNo');
+    console.log("degerrrr:  " + deger)
+    return deger;
+
   }
 
   componentDidMount = () => {
@@ -233,7 +246,7 @@ class HomeScreen extends React.Component {
           isLoading: false
         });
         let deger = '' + this.state.result;
-        console.log("deger:    "+deger+ "  selected No: "+ this.state.selectedAccountNo);
+        console.log("deger:    " + deger + "  selected No: " + this.state.selectedAccountNo);
         if (deger == "1") {
           Alert.alert("Başarıyla Para Yatırıldı!");
           this.listAccounts();
@@ -282,9 +295,10 @@ class HomeScreen extends React.Component {
         <View style={styles.container}>
           <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Hesap Listesi</Text>
           <Button title="Hesap Aç" onPress={this.openAnAccount} style={{ marginBottom: 50, marginLeft: 100, marginRight: 100, }}></Button>
-
           <FlatList
             data={this.state.accounts}
+            //refreshing={this.state.isFetching}
+            //onRefresh={() => this.onRefresh()}
             renderItem={({ item }) =>
 
               <TouchableWithoutFeedback style={{
@@ -296,21 +310,21 @@ class HomeScreen extends React.Component {
                   <Text >Hesap No: {item.accountNo}</Text>
                   <Text >Para Miktarı: {item.balance} ₺</Text>
                   <View style={styles.item}>
-                    <Button title="Hesabı Kapat" onPress={() => this.closeAnAccount(item.accountNo)}></Button>
+                    <Button  title="Hesabı Kapat" onPress={() => this.closeAnAccount(item.accountNo)}></Button>
                   </View>
-                  
+
                 </View>
 
               </TouchableWithoutFeedback>
             }
           />
           <DialogInput isDialogVisible={this.state.isDialogVisible}
-                    title={"Para Yatır"}
-                    message={"Parar Miktarını Giriniz"}
-                    hintInput={""}
-                    textInputProps={{keyboardType:'phone-pad'}}
-                    submitInput={(inputText) => { this.toDepositMoney(inputText) }}
-                    closeDialog={() => this.setState({isDialogVisible:false}) }>
+            title={"Para Yatır"}
+            message={"Parar Miktarını Giriniz"}
+            hintInput={""}
+            textInputProps={{ keyboardType: 'phone-pad' }}
+            submitInput={(inputText) => { this.toDepositMoney(inputText) }}
+            closeDialog={() => this.setState({ isDialogVisible: false })}>
           </DialogInput>
         </View>
       );
@@ -338,7 +352,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   item: {
-    backgroundColor: 'gray',
+    backgroundColor: 'white',
     marginVertical: 8,
     marginHorizontal: 16,
     flexDirection: 'column',

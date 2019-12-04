@@ -313,7 +313,7 @@ class DrawMoney extends React.Component {
                     title={"Para Çek"}
                     message={"Parar Miktarını Giriniz"}
                     hintInput={""}
-                    textInputProps={{keyboardType:'phone-pad'}}
+                    textInputProps={{keyboardType:'decimal-pad'}}
                     submitInput={(inputText) => { this.withDrawMoney(inputText) }}
                     closeDialog={() => this.setState({isDialogVisible:false}) }>
           </DialogInput>
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   item: {
-    backgroundColor: 'gray',
+    backgroundColor: 'white',
     marginVertical: 8,
     marginHorizontal: 16,
     flexDirection: 'column',

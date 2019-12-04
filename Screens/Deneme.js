@@ -82,8 +82,11 @@ class Register extends Component {
         });
     }
 
-    onPress = (values) => {
+    pressFormik=(formik)=>{
 
+    }
+
+    onPress = (values) => {
 
         fetch('https://rugratswebapi.azurewebsites.net/api/register', {
             method: 'POST',
@@ -111,7 +114,7 @@ class Register extends Component {
             const { navigate } = this.props.navigation;
 
             if (deger == "1") {
-                ToastAndroid.show("Kayıt Başarılı!", ToastAndroid.SHORT);
+                alert("Kayıt Başrılı!");
                 navigate('Login');
             }
             else if(deger == "2") {
@@ -293,7 +296,7 @@ class Register extends Component {
                                             color="blue"
                                             onPress={() => navigation.navigate('Login')}>
                                             Giriş yap
-                                            </TextCmp>
+                                        </TextCmp>
                                     </TextCmp>
                                 </Block>
                             </Block>
