@@ -26,7 +26,7 @@ renderRow = ({ item }) => {
 }
 
 
-class HomeScreen extends React.Component {
+class DepositMoney extends React.Component {
 
   constructor(props) {
     super(props);
@@ -34,19 +34,28 @@ class HomeScreen extends React.Component {
     this.state = {
       accounts: [{ accountNo: 555, balance: 50 }],
       isLoading: true,
-      tcNumber: (navigation.getParam('tcNumber', 'NO-ID')),
+      tcNumber: this.getTc(),
       result: 0,
       isDialogVisible:false,
       selectedAccountNo:0
     };
   }
 
+  getTc = async () =>{
+    const deger= await AsyncStorage.getItem('TcNo');
+    { console.log('ddddd:  ' + deger) }
+    this.setState({
+        tcNumber:deger
+    })
+  }
+
   listAccounts = () => {
+    const tc = this.getTc();
     this.setState({
       isLoading: false
     });
-    if (this.state.tcNumber !== null) {
-      console.log('tc: ' + this.state.tcNumber)
+    if (this.setState.tcNumber !== null) {
+      console.log('tc: ' + tc)
       let url = 'https://rugratswebapi.azurewebsites.net/api/account/' + this.state.tcNumber;
       console.log('url: ' + url)
       this.setState({
@@ -86,121 +95,19 @@ class HomeScreen extends React.Component {
     }
   }
 
-  give = async () =>{
-    const deger= await AsyncStorage.getItem('TcNo');
-    { console.log('ddddd:  ' + deger) }
-  }
-
   componentDidMount = () => {
-    this.give();
+    { console.log('ddddd:  ' + AsyncStorage.getItem('isLoggedIn')) }
     BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
     this.setState({
-      tcNumber: this.props.navigation.getParam('tcNumber', 'NO-ID')
+      tcNumber: this.getTc().finally(()=>{
+          this.listAccounts();
+      })
     });
-    this.listAccounts();
+    
   }
 
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
-  }
-
-  closeAnAccount = async (accountNo) => {
-    if (this.state.tcNumber !== null) {
-      console.log('tc: ' + this.state.tcNumber)
-      let url = 'https://rugratswebapi.azurewebsites.net/api/account/closeAccount';
-      console.log('url: ' + url)
-      this.setState({
-        isLoading: true
-      })
-      await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify({
-          accountNo: accountNo,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      }).then(response => {
-        return response.json()
-      }).then(json => {
-        this.setState({
-          result: json
-        });
-        console.log(this.state.result);
-
-      }).finally(() => {
-        this.setState({
-          isLoading: false
-        });
-        let deger = '' + this.state.result;
-        if (deger == "1") {
-          Alert.alert("Hesap Başarıyla Kapatıldı!");
-          this.listAccounts();
-        }
-        else if (deger == "2") {
-          Alert.alert("Hesabınızda Para Olduğu İçin Hesap Kapatılamadı!");
-        }
-        else {
-          console.log("kapatt : " + deger)
-          alert("Hesap Kapatma İşlemi Başarısız Oldu!");
-        }
-        // console.log("finally " + this.state.accounts[0].accountNo)
-      })
-        .catch((error) => {
-          console.error(error);
-        });;
-    }
-    else {
-      Alert.alert("Lütfen Giriş Yapınız!");
-    }
-  }
-
-
-  openAnAccount = async () => {
-    if (this.state.tcNumber !== null) {
-      console.log('tc: ' + this.state.tcNumber)
-      let url = 'https://rugratswebapi.azurewebsites.net/api/account/openAnAccount';
-      console.log('url: ' + url)
-      this.setState({
-        isLoading: true
-      })
-      await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify({
-          TcIdentityKey: this.state.tcNumber,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      }).then(response => {
-        return response.json()
-      }).then(json => {
-        this.setState({
-          result: json
-        });
-        console.log(this.state.result);
-
-      }).finally(() => {
-        this.setState({
-          isLoading: false
-        });
-        let deger = '' + this.state.result;
-        if (deger == "1") {
-          Alert.alert("Hesap Başarıyla Açıldı!");
-          this.listAccounts();
-        }
-        else {
-          alert("Kimlik No veya Şifre Hatalı!");
-        }
-        // console.log("finally " + this.state.accounts[0].accountNo)
-      })
-        .catch((error) => {
-          console.error(error);
-        });;
-    }
-    else {
-      Alert.alert("Lütfen Giriş Yapınız!");
-    }
   }
 
   toDepositMoney = async (balance) => {
@@ -245,6 +152,7 @@ class HomeScreen extends React.Component {
           console.log("kapatt : " + deger)
           alert("Para Yatırma İşlemi Başarısız Oldu!");
         }
+        
         // console.log("finally " + this.state.accounts[0].accountNo)
       })
         .catch((error) => {
@@ -254,7 +162,9 @@ class HomeScreen extends React.Component {
     else {
       Alert.alert("Lütfen Giriş Yapınız!");
     }
+    this.setState({isDialogVisible:false});
   }
+
 
   onBackPress = () => {
     Alert.alert(
@@ -280,9 +190,8 @@ class HomeScreen extends React.Component {
     if (this.state.isLoading === false) {
       return (
         <View style={styles.container}>
-          <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Hesap Listesi</Text>
-          <Button title="Hesap Aç" onPress={this.openAnAccount} style={{ marginBottom: 50, marginLeft: 100, marginRight: 100, }}></Button>
-
+          <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Para Yatır</Text>
+          
           <FlatList
             data={this.state.accounts}
             renderItem={({ item }) =>
@@ -296,9 +205,8 @@ class HomeScreen extends React.Component {
                   <Text >Hesap No: {item.accountNo}</Text>
                   <Text >Para Miktarı: {item.balance} ₺</Text>
                   <View style={styles.item}>
-                    <Button title="Hesabı Kapat" onPress={() => this.closeAnAccount(item.accountNo)}></Button>
-                  </View>
-                  
+                    <Button title="Para Yatır" onPress={() => this.setState({isDialogVisible:true, selectedAccountNo:item.accountNo})}></Button>
+                  </View>                 
                 </View>
 
               </TouchableWithoutFeedback>
@@ -306,12 +214,12 @@ class HomeScreen extends React.Component {
           />
           <DialogInput isDialogVisible={this.state.isDialogVisible}
                     title={"Para Yatır"}
-                    message={"Parar Miktarını Giriniz"}
+                    message={"Para Miktarını Giriniz"}
                     hintInput={""}
                     textInputProps={{keyboardType:'phone-pad'}}
                     submitInput={(inputText) => { this.toDepositMoney(inputText) }}
                     closeDialog={() => this.setState({isDialogVisible:false}) }>
-          </DialogInput>
+                  </DialogInput>
         </View>
       );
     }
@@ -349,4 +257,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default DepositMoney;

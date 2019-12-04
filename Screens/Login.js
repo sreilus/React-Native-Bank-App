@@ -55,6 +55,22 @@ class Login extends React.Component {
         ToastAndroid.show("Giriş Yapıldı!",ToastAndroid.SHORT);
     }
 
+    _storeData = async (data) => {
+        try {
+          await AsyncStorage.setItem('TcNo', data);
+        } catch (error) {
+          // Error saving data
+        }
+      };
+
+      _storeLogin = async (data) => {
+        try {
+          await AsyncStorage.setItem('isLoggedIn', data);
+        } catch (error) {
+          // Error saving data
+        }
+      };
+
     onPress = async(values) => {
         console.log(values);
         await fetch('https://rugratswebapi.azurewebsites.net/api/login', {
@@ -77,8 +93,10 @@ class Login extends React.Component {
             const { navigate } = this.props.navigation;
 
             if (deger == "1") {
-                AsyncStorage.setItem('isLoggedIn',values.tcIdentityKey);
-                this.setTcNo(values.tcIdentityKey);
+                console.log("denemee : "+values.tcIdentityKey)
+                this._storeLogin(values.tcIdentityKey);
+                console.log("logggg:  "+AsyncStorage.getItem('isLoggedIn'))
+                this._storeData(values.tcIdentityKey);
                 navigate('List', { tcNumber: values.tcIdentityKey });
                 ToastAndroid.show("Giriş Başarılı!", ToastAndroid.SHORT);
             }

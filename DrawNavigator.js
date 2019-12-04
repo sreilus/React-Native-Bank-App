@@ -35,6 +35,10 @@ import SignOut from "./Screens/SignOut";
 
 import Hidden from "./Screens/Hidden";
 
+import DrawMoney from "./Screens/DrawMoney";
+
+import DepositMoney from "./Screens/DepositMoney";
+
 import SideBar from "./components/SideBar";
 
 const LoginStack = createStackNavigator(
@@ -124,14 +128,14 @@ const DrawerNavigator = createDrawerNavigator(
             }
         },
         DrawMoney: {
-            screen: ActivityScreen,
+            screen: DrawMoney,
             navigationOptions: {
                 title: "Para Çek",
                 drawerIcon: ({ tintColor }) => <MaterialIcons name="money-off" size={16} color={tintColor} />
             }
         },
         Activity: {
-            screen: ActivityScreen,
+            screen: DepositMoney,
             navigationOptions: {
                 title: "Para Yatır",
                 drawerIcon: ({ tintColor }) => <MaterialIcons name="attach-money" size={16} color={tintColor} />
