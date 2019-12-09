@@ -16,7 +16,6 @@ import {
 import { Dimensions } from "react-native";
 import DialogInput from 'react-native-dialog-input';
 
-
 renderRow = ({ item }) => {
   return (
     <View>

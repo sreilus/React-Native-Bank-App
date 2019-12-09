@@ -35,11 +35,15 @@ import SignOut from "./Screens/SignOut";
 
 import Hidden from "./Screens/Hidden";
 
+import AlertSc from "./Screens/AlertSc";
+
 import DrawMoney from "./Screens/DrawMoney";
 
 import DepositMoney from "./Screens/DepositMoney";
 
 import SideBar from "./components/SideBar";
+
+import ModalExample from "./Screens/ModalExample";
 
 const LoginStack = createStackNavigator(
     {
@@ -163,7 +167,7 @@ const DrawerNavigator = createDrawerNavigator(
             }
         },
         Statistic: {
-            screen: StatisticScreen,
+            screen: AlertSc,
             navigationOptions: {
                 title: "Hgs İşlemleri",
                 drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="highway" size={16} color={tintColor} />
@@ -204,7 +208,7 @@ export default createAppContainer(
       {
         AuthLoading: AuthLoadingScreen,
         App: DrawerNavigator,
-        Auth: LoginStack,
+        Auth: ModalExample,
       },
       {
         initialRouteName: 'AuthLoading',
