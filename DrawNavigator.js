@@ -33,6 +33,8 @@ import Havale from "./Screens/Havale";
 
 import Virman from "./Screens/Virman";
 
+import Hgs from "./Screens/Hgs";
+
 import Register from "./Screens/Deneme";
 
 import SignOut from "./Screens/SignOut";
@@ -171,7 +173,7 @@ const DrawerNavigator = createDrawerNavigator(
             }
         },
         Statistic: {
-            screen: AlertSc,
+            screen: Hgs,
             navigationOptions: {
                 title: "Hgs İşlemleri",
                 drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="highway" size={16} color={tintColor} />
