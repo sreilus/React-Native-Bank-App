@@ -13,6 +13,7 @@ import { requiredText, tcText } from '../constants/strings';
 
 import { Formik } from 'formik';
 import * as yup from 'yup';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const styles = StyleSheet.create({
     container: {
@@ -174,7 +175,6 @@ export default class ModalExample extends Component {
                                         bordered
                                         onPress={() => {
                                             this.setState({ defaultAnimationModal: false });
-                                            formikProps.handleSubmit();
                                         }}
                                         key="button-1"
                                     />
@@ -192,6 +192,7 @@ export default class ModalExample extends Component {
                             <ModalContent
                                 style={{ backgroundColor: '#fff' }}
                             >
+                                <ScrollView>
                                 <Input
                                     full
                                     number
@@ -213,9 +214,20 @@ export default class ModalExample extends Component {
                                     style={{ marginBottom: 10, width: 250, backgroundColor: '#cfcfcf' }}
                                 //defaultValue='1'              
                                 />
-                                <Text style={{ color: 'red', marginBottom: 2 }}>hata :
+                                <Text style={{ color: 'red', marginBottom: 2 }}>
                                         {formikProps.errors.balance}
                                     </Text>
+                                    <Input
+                                    full
+                                    number
+                                    label="Açıklama"
+                                    onChangeText={formikProps.handleChange("balance")}
+                                    maxLength={30}
+                                    style={{ marginBottom: 10, width: 250, backgroundColor: '#cfcfcf' }}
+                                //defaultValue='1'              
+                                />
+                            
+                                    </ScrollView>
                             </ModalContent>
                         </Modal>
                         )}

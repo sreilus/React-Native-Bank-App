@@ -29,6 +29,10 @@ import Login from "./Screens/Login";
 
 import Home from "./Screens/HomeScreen";
 
+import Havale from "./Screens/Havale";
+
+import Virman from "./Screens/Virman";
+
 import Register from "./Screens/Deneme";
 
 import SignOut from "./Screens/SignOut";
@@ -153,14 +157,14 @@ const DrawerNavigator = createDrawerNavigator(
             }
         },
         Report: {
-            screen: ReportScreen,
+            screen: Havale,
             navigationOptions: {
                 title: "Havale",
                 drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="bank-transfer" size={16} color={tintColor} />
             }
         },
         Message: {
-            screen: MessageScreen,
+            screen: Virman,
             navigationOptions: {
                 title: "Virman",
                 drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="bank-transfer-out" size={16} color={tintColor} />
@@ -208,7 +212,7 @@ export default createAppContainer(
       {
         AuthLoading: AuthLoadingScreen,
         App: DrawerNavigator,
-        Auth: ModalExample,
+        Auth: LoginStack,
       },
       {
         initialRouteName: 'AuthLoading',
