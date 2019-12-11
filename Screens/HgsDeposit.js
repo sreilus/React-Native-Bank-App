@@ -43,15 +43,15 @@ const validationSchema = yup.object().shape({
         .moreThan(0.09, "0.1 den büyük olsun")
         .lessThan(999999, "küçük yap")
         .required(requiredText),
-    receiverAccountNo: yup
+    hgsNo: yup
         .number()
         .label('accountNo')
-        .min(99999999999999, 'En az 13 haneli girmelisiniz!')
-        .max(9999999999999999, 'En fazla 20 karakter girebilirsiniz!')
+        .min(99, 'En az 3 haneli girmelisiniz!')
+        .max(999996, 'En fazla 6 karakter girebilirsiniz!')
         .required(requiredText),
 });
 
-class Virman extends React.Component {
+export default class HgsDeposit extends React.Component {
 
     constructor(props) {
         super(props);
@@ -135,23 +135,22 @@ class Virman extends React.Component {
         BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
     }
 
-    makeVirman = async (balance, recieverAccNo, statement) => {
+    depositHgs = async (balance, hgsNo) => {
+        console.log("tt: "+this.state.selectedAccountNo)
         this.setState({ defaultAnimationModal: false });
-        console.log("b: "+balance+" receiAc "+ recieverAccNo+" st "+statement+" sender "+ this.state.selectedAccountNo )
         if (this.state.tcNumber !== null) {
             console.log('tc: ' + this.state.tcNumber)
-            let url = 'https://rugratswebapi.azurewebsites.net/api/moneytransfers/virman';
+            let url = 'https://rugratswebapi.azurewebsites.net/api/hgs/toDepositMoney';
             console.log('url: ' + url)
             this.setState({
                 isLoading: true
             })
             await fetch(url, {
-                method: 'POST',
+                method: 'PUT',
                 body: JSON.stringify({
-                    senderAccountNo: this.state.selectedAccountNo,
-                    receiverAccountNo :recieverAccNo,
-                    statement:statement,
-                    amount : balance
+                    accountNo: this.state.selectedAccountNo,
+                    HgsNo:hgsNo,
+                    balance : balance
                 }),
                 headers: {
                     "Content-type": "application/json; charset=UTF-8"
@@ -171,18 +170,24 @@ class Virman extends React.Component {
                 let deger = '' + this.state.result;
                 console.log("deger:    " + deger + "  selected No: " + this.state.selectedAccountNo);
                 if (deger == "1") {
-                    Alert.alert("Başarıyla Para Gönderildi!");
+                    Alert.alert("Başarıyla Para Yatırıldı!");
                     this.listAccounts();
                 }
-                else if (deger == "4") {
+                else if (deger == "0") {
                     Alert.alert("Hesapta yeterli bakiye yok!");
                 }
-                else if (deger == "2") {
-                    Alert.alert("Para göndermeye çalıştğınız hesap size ait değil!");
+                else if (deger == "3") {
+                    Alert.alert(" Geçersiz bir para miktarı girdiniz!");
+                }
+                else if (deger == "5") {
+                    Alert.alert("Paranın çekileceği hesapta yeterli bakiye yok!");
+                }
+                else if (deger == "6") {
+                    Alert.alert("AccountNo^ya kayıtlı bir hesap bulunamadı!");
                 }
                 else {
                     console.log("kapatt : " + deger)
-                    alert("Para Göndeme İşlemi Başarısız Oldu!");
+                    alert("Para Yatırma İşlemi Başarısız Oldu!");
                 }
                // this.setState({ defaultAnimationModal: false });
                 // console.log("finally " + this.state.accounts[0].accountNo)
@@ -222,7 +227,7 @@ class Virman extends React.Component {
         if (this.state.isLoading === false) {
             return (
                 <View style={styles.container}>
-                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Virman</Text>
+                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Hgs Hesabına Para Yatır</Text>
 
                     <FlatList
                         data={this.state.accounts}
@@ -237,16 +242,16 @@ class Virman extends React.Component {
                                     <Text >Hesap No: {item.accountNo}</Text>
                                     <Text >Para Miktarı: {item.balance} ₺</Text>
                                     <View style={styles.item}>
-                                        <Button title="Gönderen Hesabı Seçiniz" onPress={() => this.setState({ defaultAnimationModal: true, selectedAccountNo: item.accountNo })}></Button>
+                                        <Button title="Hgs'ye Para Yatır" onPress={() => this.setState({ defaultAnimationModal: true, selectedAccountNo: item.accountNo })}></Button>
                                     </View>
                                 </View>
 
                             </TouchableWithoutFeedback>
                         }
                     />
-                    <Formik initialValues={{ balance: 0, receiverAccountNo: '',statement:"" }}
+                    <Formik initialValues={{ balance: 0, hgsNo: '' }}
                         onSubmit={(values, actions) => {
-                            this.makeVirman(values.balance,values.receiverAccountNo,values.statement);
+                            this.depositHgs(values.balance,values.hgsNo);
                             
                             setTimeout(() => {
                                 actions.setSubmitting(false);
@@ -265,7 +270,7 @@ class Virman extends React.Component {
                                 }}
                                 modalTitle={
                                     <ModalTitle
-                                        title="Virman Yap"
+                                        title="Hgs'ye Para Yatır"
                                         align="left"
                                     />
                                 }
@@ -296,8 +301,8 @@ class Virman extends React.Component {
                                             full
                                             number
                                             maxLength={30}
-                                            label="Göndereceğiniz Hesap Numarası"
-                                            onChangeText={formikProps.handleChange("receiverAccountNo")}
+                                            label="Yatıracağınız Hgs Numarası"
+                                            onChangeText={formikProps.handleChange("hgsNo")}
                                             style={{ marginBottom: 5, width: 250, backgroundColor: '#cfcfcf' }}
                                         //defaultValue='1'              
                                         />
@@ -316,14 +321,6 @@ class Virman extends React.Component {
                                         <Text style={{ color: 'red', marginBottom: 2 }}>
                                             {formikProps.errors.balance}
                                         </Text>
-                                        <Input
-                                            full
-                                            label="Açıklama"
-                                            maxLength={30}
-                                            style={{ marginBottom: 10, width: 250, backgroundColor: '#cfcfcf' }}
-                                        //defaultValue='1'              
-                                        />
-
                                     </ScrollView>
                                 </ModalContent>
                             </Modal>
@@ -334,7 +331,6 @@ class Virman extends React.Component {
         }
         return (
             <View>
-                {console.log('hhhhhhh:  ' + AsyncStorage.getItem('isLoggedIn'))}
                 <Text style={{ marginTop: 25 }}>Yükleniyor Lütfen Bekleyiniz...</Text>
             </View>)
     }
@@ -365,5 +361,3 @@ const styles = StyleSheet.create({
         fontSize: 32,
     },
 });
-
-export default Virman;

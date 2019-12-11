@@ -35,6 +35,11 @@ import Virman from "./Screens/Virman";
 
 import Hgs from "./Screens/Hgs";
 
+import HgsRegister from "./Screens/HgsRegister";
+
+import HgsDeposit from "./Screens/HgsDeposit";
+
+
 import Register from "./Screens/Deneme";
 
 import SignOut from "./Screens/SignOut";
@@ -128,6 +133,20 @@ const DrawerNavigator = createDrawerNavigator(
             screen: RegisterStack,
             navigationOptions: {
                 title: "RegstScr",
+                drawerLabel: <Hidden />
+            }
+        },
+        HgsRegister: {
+            screen: HgsRegister,
+            navigationOptions: {
+                title: "EmptyScr",
+                drawerLabel: <Hidden />
+            }
+        },
+        HgsDeposit: {
+            screen: HgsDeposit,
+            navigationOptions: {
+                title: "EmptyScr",
                 drawerLabel: <Hidden />
             }
         },

@@ -45,7 +45,6 @@ class HomeScreen extends React.Component {
   onRefresh = async() =>{
     this.setState({
       isFetching: true,
-      tcNumber: this.give()
     });
     console.log("tccc: "+this.state.tcNumber)
     this.listAccounts();
@@ -297,8 +296,8 @@ class HomeScreen extends React.Component {
           <Button title="Hesap Aç" onPress={this.openAnAccount} style={{ marginBottom: 50, marginLeft: 100, marginRight: 100, }}></Button>
           <FlatList
             data={this.state.accounts}
-            //refreshing={this.state.isFetching}
-            //onRefresh={() => this.onRefresh()}
+            refreshing={this.state.isFetching}
+            onRefresh={() => this.onRefresh()}
             renderItem={({ item }) =>
 
               <TouchableWithoutFeedback style={{
