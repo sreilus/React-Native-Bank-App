@@ -40,18 +40,18 @@ const validationSchema = yup.object().shape({
     balance: yup
         .number()
         .label('balance')
-        .moreThan(0.09, "0.1 den büyük olmalı")
-        .lessThan(999999, "en fazla 999999 tl yatırabilirsiniz")
+        .moreThan(0.09, "0.1 den büyük olsun")
+        .lessThan(999999, "küçük yap")
         .required(requiredText),
-    hgsNo: yup
+    receiverAccountNo: yup
         .number()
         .label('accountNo')
-        .min(99, 'En az 3 haneli girmelisiniz!')
-        .max(999996, 'En fazla 6 karakter girebilirsiniz!')
+        .min(99999999999999, 'En az 13 haneli girmelisiniz!')
+        .max(9999999999999999, 'En fazla 20 karakter girebilirsiniz!')
         .required(requiredText),
 });
 
-export default class HgsDeposit extends React.Component {
+export default class MoneyTranferList extends React.Component {
 
     constructor(props) {
         super(props);
@@ -64,6 +64,14 @@ export default class HgsDeposit extends React.Component {
             selectedAccountNo: 0,
             defaultAnimationModal: false,
             isFetching: false,
+            moneyTranferList: [{
+                receiverAccountNo: "111111111111001",
+                senderAccountNo: "111111111111001",
+                transferType: "Para Çekme",
+                amount: 102.0000,
+                statement: "",
+                realizationTime: "2019-12-11T09:35:12.483"
+            }]
         };
     }
 
@@ -112,7 +120,40 @@ export default class HgsDeposit extends React.Component {
         }
         this.setState({
             isFetching: false,
-          });
+        });
+    }
+
+    getMoneyTransfers = (accountNo) => {
+        let url = 'https://rugratswebapi.azurewebsites.net/api/MoneyTransfers/getTransferList/' + accountNo;
+        console.log('url: ' + url)
+        fetch(url)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                //console.log(responseJson);
+                console.log("veri : " + responseJson);
+                this.setState({
+                    moneyTranferList: responseJson
+                }, function () {
+                });
+
+            }).finally(() => {
+
+                // console.log("finally " + this.state.accounts[0].accountNo)
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+        this.setState({
+            isFetching: false,
+        });
+    }
+
+    onRefresh = async () => {
+        this.setState({
+            isFetching: true,
+        });
+        this.listAccounts();
     }
 
     componentWillMount() {
@@ -139,78 +180,14 @@ export default class HgsDeposit extends React.Component {
         BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
     }
 
-    depositHgs = async (balance, hgsNo) => {
-        console.log("tt: "+this.state.selectedAccountNo)
-        this.setState({ defaultAnimationModal: false });
-        if (this.state.tcNumber !== null) {
-            console.log('tc: ' + this.state.tcNumber)
-            let url = 'https://rugratswebapi.azurewebsites.net/api/hgs/toDepositMoney';
-            console.log('url: ' + url)
-            this.setState({
-                isLoading: true
-            })
-            await fetch(url, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    accountNo: this.state.selectedAccountNo,
-                    HgsNo:hgsNo,
-                    balance : balance
-                }),
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                }
-            }).then(response => {
-                return response.json()
-            }).then(json => {
-                this.setState({
-                    result: json
-                });
-                console.log(this.state.result);
-
-            }).finally(() => {
-                this.setState({
-                    isLoading: false
-                });
-                let deger = '' + this.state.result;
-                console.log("deger:    " + deger + "  selected No: " + this.state.selectedAccountNo);
-                if (deger == "1") {
-                    Alert.alert("Başarıyla Para Yatırıldı!");
-                    this.listAccounts();
-                }
-                else if (deger == "0") {
-                    Alert.alert("Hesapta yeterli bakiye yok!");
-                }
-                else if (deger == "3") {
-                    Alert.alert(" Geçersiz bir para miktarı girdiniz!");
-                }
-                else if (deger == "5") {
-                    Alert.alert("Paranın çekileceği hesapta yeterli bakiye yok!");
-                }
-                else if (deger == "6") {
-                    Alert.alert("AccountNo^ya kayıtlı bir hesap bulunamadı!");
-                }
-                else {
-                    console.log("kapatt : " + deger)
-                    alert("Para Yatırma İşlemi Başarısız Oldu!");
-                }
-               // this.setState({ defaultAnimationModal: false });
-                // console.log("finally " + this.state.accounts[0].accountNo)
-            })
-                .catch((error) => {
-                    console.error(error);
-                });;
-        }
-        else {
-            Alert.alert("Lütfen Giriş Yapınız!");
-        }
-       
-    }
-    onRefresh = async () => {
+    onPressTrannsfers = (accountNo) => {
         this.setState({
-          isFetching: true,
-        });
-        this.listAccounts();
-      }
+            defaultAnimationModal: true,
+            selectedAccountNo: accountNo
+        })
+        this.getMoneyTransfers(accountNo);
+    }
+
 
     onBackPress = () => {
         Alert.alert(
@@ -236,7 +213,7 @@ export default class HgsDeposit extends React.Component {
         if (this.state.isLoading === false) {
             return (
                 <View style={styles.container}>
-                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.25 }}>Hgs Hesabına Para Yatır</Text>
+                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.25 }}>Hesap Hareketleri</Text>
 
                     <FlatList
                         data={this.state.accounts}
@@ -253,17 +230,17 @@ export default class HgsDeposit extends React.Component {
                                     <Text >Hesap No: {item.accountNo}</Text>
                                     <Text >Para Miktarı: {item.balance} ₺</Text>
                                     <View style={styles.item}>
-                                        <Button title="Hgs'ye Para Yatır" onPress={() => this.setState({ defaultAnimationModal: true, selectedAccountNo: item.accountNo })}></Button>
+                                        <Button title="Hesap Hareketleri" onPress={() => this.onPressTrannsfers(item.accountNo)}></Button>
                                     </View>
                                 </View>
 
                             </TouchableWithoutFeedback>
                         }
                     />
-                    <Formik initialValues={{ balance: 0, hgsNo: '' }}
+                    <Formik initialValues={{ balance: 0, receiverAccountNo: '', statement: "" }}
                         onSubmit={(values, actions) => {
-                            this.depositHgs(values.balance,values.hgsNo);
-                            
+                            this.makeHavale(values.balance, values.receiverAccountNo, values.statement);
+
                             setTimeout(() => {
                                 actions.setSubmitting(false);
                             }, 1000);
@@ -275,32 +252,28 @@ export default class HgsDeposit extends React.Component {
                                 width={0.9}
                                 visible={this.state.defaultAnimationModal}
                                 rounded
+                                style={{marginTop:60}}
                                 actionsBordered
                                 onTouchOutside={() => {
                                     //this.setState({ defaultAnimationModal: false });
                                 }}
                                 modalTitle={
                                     <ModalTitle
-                                        title="Hgs'ye Para Yatır"
+                                        title="Hesap Özeti"
                                         align="left"
                                     />
                                 }
                                 footer={
                                     <ModalFooter>
                                         <ModalButton
-                                            text="İPTAL"
+                                            text="KAPAT"
                                             bordered
                                             onPress={() => {
                                                 this.setState({ defaultAnimationModal: false });
                                             }}
                                             key="button-1"
                                         />
-                                        <ModalButton
-                                            text="GÖNDER"
-                                            bordered
-                                            onPress={formikProps.handleSubmit}
-                                            key="button-2"
-                                        />
+
                                     </ModalFooter>
                                 }
                             >
@@ -308,30 +281,32 @@ export default class HgsDeposit extends React.Component {
                                     style={{ backgroundColor: '#fff' }}
                                 >
                                     <ScrollView>
-                                        <Input
-                                            full
-                                            number
-                                            maxLength={30}
-                                            label="Yatıracağınız Hgs Numarası"
-                                            onChangeText={formikProps.handleChange("hgsNo")}
-                                            style={{ marginBottom: 5, width: 250, backgroundColor: '#cfcfcf' }}
-                                        //defaultValue='1'              
+                                    <Button title="Kapat" style={{marginTop:30}} onPress={() => this.setState({
+                                            defaultAnimationModal: false
+                                        })}></Button>
+                                        <FlatList
+                                            data={this.state.moneyTranferList}
+                                            renderItem={({ item }) =>
+
+                                                <TouchableWithoutFeedback style={{
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'space-between',
+                                                }}>
+
+                                                    <View style={styles.view}>
+                                                        <Text >Alıcı: {item.receiverAccountNo}</Text>
+                                                        <Text >Gönderen: {item.senderAccountNo} </Text>
+                                                        <Text >Transfer Türü: {item.transferType}</Text>
+                                                        <Text >Para Miktarı: {item.amount} ₺</Text>
+                                                        <Text >Açıklama: {item.statement}</Text>
+                                                        <Text >Tarih: {item.realizationTime}</Text>
+                                                    </View>
+
+                                                </TouchableWithoutFeedback>
+                                            }
                                         />
-                                        <Text style={{ color: 'red', marginBottom: 2 }}>
-                                            {formikProps.errors.receiverAccountNo}
-                                        </Text>
-                                        <Input
-                                            full
-                                            number
-                                            label="Para Miktarı"
-                                            onChangeText={formikProps.handleChange("balance")}
-                                            maxLength={30}
-                                            style={{ marginBottom: 10, width: 250, backgroundColor: '#cfcfcf' }}
-                                        //defaultValue='1'              
-                                        />
-                                        <Text style={{ color: 'red', marginBottom: 2 }}>
-                                            {formikProps.errors.balance}
-                                        </Text>
+                                        
+
                                     </ScrollView>
                                 </ModalContent>
                             </Modal>
@@ -342,6 +317,7 @@ export default class HgsDeposit extends React.Component {
         }
         return (
             <View>
+                {console.log('hhhhhhh:  ' + AsyncStorage.getItem('isLoggedIn'))}
                 <Text style={{ marginTop: 25 }}>Yükleniyor Lütfen Bekleyiniz...</Text>
             </View>)
     }

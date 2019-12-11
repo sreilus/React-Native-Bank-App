@@ -49,7 +49,16 @@ class HomeScreen extends React.Component {
     this.listAccounts();
   }
 
+  getTc = async () => {
+    const deger = await AsyncStorage.getItem('TcNo');
+    { console.log('ddddd:  ' + deger) }
+    this.setState({
+      tcNumber: deger
+    })
+  }
+
   listAccounts = async () => {
+    this.getTc();
     this.setState({
       isLoading: false
     });

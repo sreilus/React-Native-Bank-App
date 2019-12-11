@@ -31,6 +31,8 @@ import Home from "./Screens/HomeScreen";
 
 import Havale from "./Screens/Havale";
 
+import MoneyTransferList from "./Screens/MoneyTransferList";
+
 import Virman from "./Screens/Virman";
 
 import VirmanRecieve from "./Screens/VirmanRecieve";
@@ -200,6 +202,13 @@ const DrawerNavigator = createDrawerNavigator(
                 drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="bank-transfer-out" size={16} color={tintColor} />
             }
         },
+        MoneyTransferList: {
+            screen: MoneyTransferList,
+            navigationOptions: {
+                title: "Para Transferleri",
+                drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="bank-transfer" size={16} color={tintColor} />
+            }
+        },
         Statistic: {
             screen: Hgs,
             navigationOptions: {
@@ -242,7 +251,7 @@ export default createAppContainer(
       {
         AuthLoading: AuthLoadingScreen,
         App: DrawerNavigator,
-        Auth: Hgs,
+        Auth: LoginStack,
       },
       {
         initialRouteName: 'AuthLoading',
