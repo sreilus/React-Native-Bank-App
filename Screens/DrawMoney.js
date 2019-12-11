@@ -35,16 +35,17 @@ class DrawMoney extends React.Component {
       isLoading: true,
       tcNumber: this.getTc(),
       result: 0,
-      isDialogVisible:false,
-      selectedAccountNo:0
+      isDialogVisible: false,
+      selectedAccountNo: 0,
+      isFetching: false,
     };
   }
 
-  getTc = async () =>{
-    const deger= await AsyncStorage.getItem('TcNo');
+  getTc = async () => {
+    const deger = await AsyncStorage.getItem('TcNo');
     { console.log('ddddd:  ' + deger) }
     this.setState({
-        tcNumber:deger
+      tcNumber: deger
     })
   }
 
@@ -83,6 +84,16 @@ class DrawMoney extends React.Component {
     else {
       Alert.alert("Lütfen Giriş Yapınız!");
     }
+    this.setState({
+      isFetching: false,
+    });
+  }
+
+  onRefresh = async () => {
+    this.setState({
+      isFetching: true,
+    });
+    this.listAccounts();
   }
 
   componentWillMount() {
@@ -98,11 +109,11 @@ class DrawMoney extends React.Component {
     { console.log('ddddd:  ' + AsyncStorage.getItem('isLoggedIn')) }
     BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
     this.setState({
-      tcNumber: this.getTc().finally(()=>{
-          this.listAccounts();
+      tcNumber: this.getTc().finally(() => {
+        this.listAccounts();
       })
     });
-    
+
   }
 
   componentWillUnmount() {
@@ -238,7 +249,7 @@ class DrawMoney extends React.Component {
           isLoading: false
         });
         let deger = '' + this.state.result;
-        console.log("deger:    "+deger+ "  selected No: "+ this.state.selectedAccountNo);
+        console.log("deger:    " + deger + "  selected No: " + this.state.selectedAccountNo);
         if (deger == "1") {
           Alert.alert("Başarıyla Para Çekildi!");
           this.listAccounts();
@@ -259,7 +270,7 @@ class DrawMoney extends React.Component {
     else {
       Alert.alert("Lütfen Giriş Yapınız!");
     }
-    this.setState({isDialogVisible:false});
+    this.setState({ isDialogVisible: false });
   }
 
   onBackPress = () => {
@@ -290,6 +301,8 @@ class DrawMoney extends React.Component {
 
           <FlatList
             data={this.state.accounts}
+            refreshing={this.state.isFetching}
+            onRefresh={() => this.onRefresh()}
             renderItem={({ item }) =>
 
               <TouchableWithoutFeedback style={{
@@ -301,20 +314,20 @@ class DrawMoney extends React.Component {
                   <Text >Hesap No: {item.accountNo}</Text>
                   <Text >Para Miktarı: {item.balance} ₺</Text>
                   <View style={styles.item}>
-                    <Button title="Para Çek" onPress={() => this.setState({isDialogVisible:true, selectedAccountNo:item.accountNo})}></Button>
-                  </View>                 
+                    <Button title="Para Çek" onPress={() => this.setState({ isDialogVisible: true, selectedAccountNo: item.accountNo })}></Button>
+                  </View>
                 </View>
 
               </TouchableWithoutFeedback>
             }
           />
           <DialogInput isDialogVisible={this.state.isDialogVisible}
-                    title={"Para Çek"}
-                    message={"Parar Miktarını Giriniz"}
-                    hintInput={""}
-                    textInputProps={{keyboardType:'decimal-pad'}}
-                    submitInput={(inputText) => { this.withDrawMoney(inputText) }}
-                    closeDialog={() => this.setState({isDialogVisible:false}) }>
+            title={"Para Çek"}
+            message={"Parar Miktarını Giriniz"}
+            hintInput={""}
+            textInputProps={{ keyboardType: 'decimal-pad' }}
+            submitInput={(inputText) => { this.withDrawMoney(inputText) }}
+            closeDialog={() => this.setState({ isDialogVisible: false })}>
           </DialogInput>
         </View>
       );

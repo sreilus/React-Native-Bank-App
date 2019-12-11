@@ -62,7 +62,8 @@ class Havale extends React.Component {
             tcNumber: this.getTc(),
             result: 0,
             selectedAccountNo: 0,
-            defaultAnimationModal: false
+            defaultAnimationModal: false,
+            isFetching: false,
         };
     }
 
@@ -109,7 +110,17 @@ class Havale extends React.Component {
         else {
             Alert.alert("Lütfen Giriş Yapınız!");
         }
+        this.setState({
+            isFetching: false,
+          });
     }
+
+    onRefresh = async () => {
+        this.setState({
+          isFetching: true,
+        });
+        this.listAccounts();
+      }
 
     componentWillMount() {
         console.log('ccccc:  ' + AsyncStorage.getItem('isLoggedIn'))
@@ -229,6 +240,8 @@ class Havale extends React.Component {
 
                     <FlatList
                         data={this.state.accounts}
+                        refreshing={this.state.isFetching}
+                        onRefresh={() => this.onRefresh()}
                         renderItem={({ item }) =>
 
                             <TouchableWithoutFeedback style={{

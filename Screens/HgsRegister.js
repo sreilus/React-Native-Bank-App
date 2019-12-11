@@ -36,7 +36,8 @@ export default class HgsRegister extends React.Component {
             tcNumber: this.getTc(),
             result: 0,
             isDialogVisible: false,
-            selectedAccountNo: 0
+            selectedAccountNo: 0,
+            isFetching: false,
         };
     }
 
@@ -83,6 +84,9 @@ export default class HgsRegister extends React.Component {
         else {
             Alert.alert("Lütfen Giriş Yapınız!");
         }
+        this.setState({
+            isFetching: false,
+          });
     }
 
     componentWillMount() {
@@ -93,6 +97,13 @@ export default class HgsRegister extends React.Component {
             AsyncStorage.removeItem("isLoggedIn");
         }
     }
+
+    onRefresh = async () => {
+        this.setState({
+          isFetching: true,
+        });
+        this.listAccounts();
+      }
 
     componentDidMount = () => {
         { console.log('ddddd:  ' + AsyncStorage.getItem('isLoggedIn')) }
@@ -299,6 +310,8 @@ export default class HgsRegister extends React.Component {
 
                     <FlatList
                         data={this.state.accounts}
+                        refreshing={this.state.isFetching}
+                        onRefresh={() => this.onRefresh()}
                         renderItem={({ item }) =>
 
                             <TouchableWithoutFeedback style={{

@@ -36,16 +36,17 @@ class DepositMoney extends React.Component {
       isLoading: true,
       tcNumber: this.getTc(),
       result: 0,
-      isDialogVisible:false,
-      selectedAccountNo:0
+      isDialogVisible: false,
+      selectedAccountNo: 0,
+      isFetching: false,
     };
   }
 
-  getTc = async () =>{
-    const deger= await AsyncStorage.getItem('TcNo');
+  getTc = async () => {
+    const deger = await AsyncStorage.getItem('TcNo');
     { console.log('ddddd:  ' + deger) }
     this.setState({
-        tcNumber:deger
+      tcNumber: deger
     })
   }
 
@@ -84,6 +85,9 @@ class DepositMoney extends React.Component {
     else {
       Alert.alert("Lütfen Giriş Yapınız!");
     }
+    this.setState({
+      isFetching: false,
+    });
   }
 
   componentWillMount() {
@@ -99,11 +103,11 @@ class DepositMoney extends React.Component {
     { console.log('ddddd:  ' + AsyncStorage.getItem('isLoggedIn')) }
     BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
     this.setState({
-      tcNumber: this.getTc().finally(()=>{
-          this.listAccounts();
+      tcNumber: this.getTc().finally(() => {
+        this.listAccounts();
       })
     });
-    
+
   }
 
   componentWillUnmount() {
@@ -140,7 +144,7 @@ class DepositMoney extends React.Component {
           isLoading: false
         });
         let deger = '' + this.state.result;
-        console.log("deger:    "+deger+ "  selected No: "+ this.state.selectedAccountNo);
+        console.log("deger:    " + deger + "  selected No: " + this.state.selectedAccountNo);
         if (deger == "1") {
           Alert.alert("Başarıyla Para Yatırıldı!");
           this.listAccounts();
@@ -152,7 +156,7 @@ class DepositMoney extends React.Component {
           console.log("kapatt : " + deger)
           alert("Para Yatırma İşlemi Başarısız Oldu!");
         }
-        
+
         // console.log("finally " + this.state.accounts[0].accountNo)
       })
         .catch((error) => {
@@ -162,7 +166,13 @@ class DepositMoney extends React.Component {
     else {
       Alert.alert("Lütfen Giriş Yapınız!");
     }
-    this.setState({isDialogVisible:false});
+    this.setState({ isDialogVisible: false });
+  }
+  onRefresh = async () => {
+    this.setState({
+      isFetching: true,
+    });
+    this.listAccounts();
   }
 
 
@@ -191,9 +201,11 @@ class DepositMoney extends React.Component {
       return (
         <View style={styles.container}>
           <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Para Yatır</Text>
-          
+
           <FlatList
             data={this.state.accounts}
+            refreshing={this.state.isFetching}
+            onRefresh={() => this.onRefresh()}
             renderItem={({ item }) =>
 
               <TouchableWithoutFeedback style={{
@@ -205,21 +217,21 @@ class DepositMoney extends React.Component {
                   <Text >Hesap No: {item.accountNo}</Text>
                   <Text >Para Miktarı: {item.balance} ₺</Text>
                   <View style={styles.item}>
-                    <Button title="Para Yatır" onPress={() => this.setState({isDialogVisible:true, selectedAccountNo:item.accountNo})}></Button>
-                  </View>                 
+                    <Button title="Para Yatır" onPress={() => this.setState({ isDialogVisible: true, selectedAccountNo: item.accountNo })}></Button>
+                  </View>
                 </View>
 
               </TouchableWithoutFeedback>
             }
           />
           <DialogInput isDialogVisible={this.state.isDialogVisible}
-                    title={"Para Yatır"}
-                    message={"Para Miktarını Giriniz"}
-                    hintInput={""}
-                    textInputProps={{keyboardType:'decimal-pad'}}
-                    submitInput={(inputText) => { this.toDepositMoney(inputText) }}
-                    closeDialog={() => this.setState({isDialogVisible:false}) }>
-                  </DialogInput>
+            title={"Para Yatır"}
+            message={"Para Miktarını Giriniz"}
+            hintInput={""}
+            textInputProps={{ keyboardType: 'decimal-pad' }}
+            submitInput={(inputText) => { this.toDepositMoney(inputText) }}
+            closeDialog={() => this.setState({ isDialogVisible: false })}>
+          </DialogInput>
         </View>
       );
     }

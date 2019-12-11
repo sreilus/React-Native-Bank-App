@@ -43,15 +43,9 @@ const validationSchema = yup.object().shape({
         .moreThan(0.09, "0.1 den büyük olsun")
         .lessThan(999999, "küçük yap")
         .required(requiredText),
-    receiverAccountNo: yup
-        .number()
-        .label('accountNo')
-        .min(99999999999999, 'En az 13 haneli girmelisiniz!')
-        .max(9999999999999999, 'En fazla 20 karakter girebilirsiniz!')
-        .required(requiredText),
 });
 
-class Virman extends React.Component {
+class VirmanRecieve extends React.Component {
 
     constructor(props) {
         super(props);
@@ -62,7 +56,9 @@ class Virman extends React.Component {
             tcNumber: this.getTc(),
             result: 0,
             selectedAccountNo: 0,
-            defaultAnimationModal: false
+            defaultAnimationModal: false,
+            senderAccountNo: (navigation.getParam('senderAccountNo', 'NO-ID')),
+            isFetching: false,
         };
     }
 
@@ -109,6 +105,9 @@ class Virman extends React.Component {
         else {
             Alert.alert("Lütfen Giriş Yapınız!");
         }
+        this.setState({
+            isFetching:false
+        })
     }
 
     componentWillMount() {
@@ -135,11 +134,8 @@ class Virman extends React.Component {
         BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
     }
 
-    makeVirman = async (balance, recieverAccNo, statement) => {
+    makeVirman = async (balance, statement) => {
         this.setState({ defaultAnimationModal: false });
-        console.log("b: "+balance+" receiAc "+ recieverAccNo+" st "+statement+" sender "+ this.state.selectedAccountNo )
-        if (this.state.tcNumber !== null) {
-            console.log('tc: ' + this.state.tcNumber)
             let url = 'https://rugratswebapi.azurewebsites.net/api/moneytransfers/virman';
             console.log('url: ' + url)
             this.setState({
@@ -148,10 +144,10 @@ class Virman extends React.Component {
             await fetch(url, {
                 method: 'POST',
                 body: JSON.stringify({
-                    senderAccountNo: this.state.selectedAccountNo,
-                    receiverAccountNo :recieverAccNo,
-                    statement:statement,
-                    amount : balance
+                    senderAccountNo: this.state.senderAccountNo,
+                    receiverAccountNo: this.state.selectedAccountNo,
+                    statement: statement,
+                    amount: balance
                 }),
                 headers: {
                     "Content-type": "application/json; charset=UTF-8"
@@ -184,19 +180,30 @@ class Virman extends React.Component {
                     console.log("kapatt : " + deger)
                     alert("Para Göndeme İşlemi Başarısız Oldu!");
                 }
-               // this.setState({ defaultAnimationModal: false });
+                // this.setState({ defaultAnimationModal: false });
                 // console.log("finally " + this.state.accounts[0].accountNo)
             })
                 .catch((error) => {
                     console.error(error);
                 });;
-        }
-        else {
-            Alert.alert("Lütfen Giriş Yapınız!");
-        }
-       
+        
     }
 
+    onPressItem = (accountNo) => {
+        this.setState({
+            selectedAccountNo: accountNo,
+            defaultAnimationModal: true
+        });
+
+    }
+
+    onRefresh = async() =>{
+        this.setState({
+          isFetching: true,
+        });
+        this.listAccounts();
+      }
+    
 
     onBackPress = () => {
         Alert.alert(
@@ -222,10 +229,12 @@ class Virman extends React.Component {
         if (this.state.isLoading === false) {
             return (
                 <View style={styles.container}>
-                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Virman</Text>
+                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.30 }}>Virman-Alıcı</Text>
 
                     <FlatList
                         data={this.state.accounts}
+                        refreshing={this.state.isFetching}
+                        onRefresh={() => this.onRefresh()}
                         renderItem={({ item }) =>
 
                             <TouchableWithoutFeedback style={{
@@ -237,17 +246,17 @@ class Virman extends React.Component {
                                     <Text >Hesap No: {item.accountNo}</Text>
                                     <Text >Para Miktarı: {item.balance} ₺</Text>
                                     <View style={styles.item}>
-                                        <Button title="Gönderen Hesabı Seçiniz" onPress={() => this.setState({ defaultAnimationModal: true, selectedAccountNo: item.accountNo })}></Button>
+                                        <Button title="Alıcı Hesabı Seçiniz" onPress={() => this.onPressItem(item.accountNo)}></Button>
                                     </View>
                                 </View>
 
                             </TouchableWithoutFeedback>
                         }
                     />
-                    <Formik initialValues={{ balance: 0, receiverAccountNo: '',statement:"" }}
+                    <Formik initialValues={{ balance: 0, statement: "" }}
                         onSubmit={(values, actions) => {
-                            this.makeVirman(values.balance,values.receiverAccountNo,values.statement);
-                            
+                            this.makeVirman(values.balance, values.statement);
+                           
                             setTimeout(() => {
                                 actions.setSubmitting(false);
                             }, 1000);
@@ -292,18 +301,8 @@ class Virman extends React.Component {
                                     style={{ backgroundColor: '#fff' }}
                                 >
                                     <ScrollView>
-                                        <Input
-                                            full
-                                            number
-                                            maxLength={30}
-                                            label="Göndereceğiniz Hesap Numarası"
-                                            onChangeText={formikProps.handleChange("receiverAccountNo")}
-                                            style={{ marginBottom: 5, width: 250, backgroundColor: '#cfcfcf' }}
-                                        //defaultValue='1'              
-                                        />
-                                        <Text style={{ color: 'red', marginBottom: 2 }}>
-                                            {formikProps.errors.receiverAccountNo}
-                                        </Text>
+                                        <Text>Alıcı Hesap No: {this.state.selectedAccountNo}</Text>
+                                        <Text>Gönderen Hesap No: {this.state.senderAccountNo}</Text>
                                         <Input
                                             full
                                             number
@@ -320,10 +319,13 @@ class Virman extends React.Component {
                                             full
                                             label="Açıklama"
                                             maxLength={30}
+                                            onChangeText={formikProps.handleChange("statement")}
                                             style={{ marginBottom: 10, width: 250, backgroundColor: '#cfcfcf' }}
                                         //defaultValue='1'              
                                         />
-
+                                        <Text style={{ color: 'red', marginBottom: 2 }}>
+                                            {formikProps.errors.balance}
+                                        </Text>
                                     </ScrollView>
                                 </ModalContent>
                             </Modal>
@@ -366,4 +368,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Virman;
+export default VirmanRecieve;

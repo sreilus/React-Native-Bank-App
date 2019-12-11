@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Platform, StyleSheet, View, Button, Picker, Alert,AsyncStorage,FlatList,TouchableWithoutFeedback } from "react-native";
+import { Platform, StyleSheet, View, Button, Picker, Alert, AsyncStorage, FlatList, TouchableWithoutFeedback } from "react-native";
 
 export default class Hgs extends Component {
 
@@ -14,14 +14,14 @@ export default class Hgs extends Component {
     }
   }
 
- 
+
   getTc = async () => {
-    
-    await AsyncStorage.getItem('TcNo').then((value)=>{
+
+    await AsyncStorage.getItem('TcNo').then((value) => {
       this.setState({
-        tcNumber:value
+        tcNumber: value
       })
-       //alert(value)
+      //alert(value)
     }).done();
   }
 
@@ -62,7 +62,7 @@ export default class Hgs extends Component {
   }
 
 
-  registerHgs = async (balance,accountNo) => {
+  registerHgs = async (balance, accountNo) => {
     if (this.state.tcNumber !== null) {
       console.log('tc: ' + this.state.tcNumber)
       let url = 'https://rugratswebapi.azurewebsites.net/api/account/withDrawMoney';
@@ -92,7 +92,7 @@ export default class Hgs extends Component {
           isLoading: false
         });
         let deger = '' + this.state.result;
-        console.log("deger:    "+deger+ "  selected No: "+ this.state.selectedAccountNo);
+        console.log("deger:    " + deger + "  selected No: " + this.state.selectedAccountNo);
         if (deger == "1") {
           Alert.alert("Başarıyla Para Çekildi!");
           this.listAccounts();
@@ -113,7 +113,7 @@ export default class Hgs extends Component {
     else {
       Alert.alert("Lütfen Giriş Yapınız!");
     }
-    this.setState({isDialogVisible:false});
+    this.setState({ isDialogVisible: false });
   }
 
   componentDidMount = () => {
@@ -131,9 +131,9 @@ export default class Hgs extends Component {
   render() {
     return (
       <View style={styles.container}>
-       
-        <Button title="Hgs Hesabı Aç" style={{marginBottom:10}} onPress={()=>this.props.navigation.navigate('HgsRegister',{ tcNumber: this.state.tcNumber })} />
-        <Button title="Hgs'ye Para Yatır" onPress={()=>this.props.navigation.navigate('HgsDeposit')} />
+
+        <Button title="Hgs Hesabı Aç" style={{marginBottom:20}} onPress={() => this.props.navigation.navigate('HgsRegister', { tcNumber: this.state.tcNumber })} />
+       <Button title="Hgs'ye Para Yatır"  style={{margin:20}} onPress={() => this.props.navigation.navigate('HgsDeposit')} />
 
       </View>
     );
@@ -143,8 +143,15 @@ export default class Hgs extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    margin: 30
-  },
+    flex:1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent : "space-around"
+},
+element: {
+    margin: 5,
+    borderWidth: 1,
+    padding: 10,
+    height: 50,
+},
 });

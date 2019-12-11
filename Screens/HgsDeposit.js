@@ -62,7 +62,8 @@ export default class HgsDeposit extends React.Component {
             tcNumber: this.getTc(),
             result: 0,
             selectedAccountNo: 0,
-            defaultAnimationModal: false
+            defaultAnimationModal: false,
+            isFetching: false,
         };
     }
 
@@ -109,6 +110,9 @@ export default class HgsDeposit extends React.Component {
         else {
             Alert.alert("Lütfen Giriş Yapınız!");
         }
+        this.setState({
+            isFetching: false,
+          });
     }
 
     componentWillMount() {
@@ -201,7 +205,12 @@ export default class HgsDeposit extends React.Component {
         }
        
     }
-
+    onRefresh = async () => {
+        this.setState({
+          isFetching: true,
+        });
+        this.listAccounts();
+      }
 
     onBackPress = () => {
         Alert.alert(
@@ -227,10 +236,12 @@ export default class HgsDeposit extends React.Component {
         if (this.state.isLoading === false) {
             return (
                 <View style={styles.container}>
-                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Hgs Hesabına Para Yatır</Text>
+                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.25 }}>Hgs Hesabına Para Yatır</Text>
 
                     <FlatList
                         data={this.state.accounts}
+                        refreshing={this.state.isFetching}
+                        onRefresh={() => this.onRefresh()}
                         renderItem={({ item }) =>
 
                             <TouchableWithoutFeedback style={{

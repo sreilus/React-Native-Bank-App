@@ -46,7 +46,6 @@ class HomeScreen extends React.Component {
     this.setState({
       isFetching: true,
     });
-    console.log("tccc: "+this.state.tcNumber)
     this.listAccounts();
   }
 

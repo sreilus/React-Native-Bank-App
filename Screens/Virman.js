@@ -62,7 +62,8 @@ class Virman extends React.Component {
             tcNumber: this.getTc(),
             result: 0,
             selectedAccountNo: 0,
-            defaultAnimationModal: false
+            defaultAnimationModal: false,
+            isFetching: false,
         };
     }
 
@@ -109,6 +110,9 @@ class Virman extends React.Component {
         else {
             Alert.alert("Lütfen Giriş Yapınız!");
         }
+        this.setState({
+            isFetching: false,
+          });
     }
 
     componentWillMount() {
@@ -197,6 +201,18 @@ class Virman extends React.Component {
        
     }
 
+    chooseAcc=(accountNo)=>{
+        this.setState({  selectedAccountNo: accountNo });
+        this.props.navigation.navigate("VirmanRecieve",{ senderAccountNo: accountNo });
+    }
+
+    onRefresh = async() =>{
+        this.setState({
+          isFetching: true,
+        });
+        this.listAccounts();
+      }
+    
 
     onBackPress = () => {
         Alert.alert(
@@ -222,10 +238,12 @@ class Virman extends React.Component {
         if (this.state.isLoading === false) {
             return (
                 <View style={styles.container}>
-                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.38 }}>Virman</Text>
+                    <Text style={{ marginTop: 5, marginBottom: 5, fontSize: 18, marginLeft: Dimensions.get("window").width * 0.30 }}>Virman-Gönderen</Text>
 
                     <FlatList
                         data={this.state.accounts}
+                        refreshing={this.state.isFetching}
+                        onRefresh={() => this.onRefresh()}
                         renderItem={({ item }) =>
 
                             <TouchableWithoutFeedback style={{
@@ -237,7 +255,7 @@ class Virman extends React.Component {
                                     <Text >Hesap No: {item.accountNo}</Text>
                                     <Text >Para Miktarı: {item.balance} ₺</Text>
                                     <View style={styles.item}>
-                                        <Button title="Gönderen Hesabı Seçiniz" onPress={() => this.setState({ defaultAnimationModal: true, selectedAccountNo: item.accountNo })}></Button>
+                                        <Button title="Gönderen Hesabı Seçiniz" onPress={() => this.chooseAcc(item.accountNo)}></Button>
                                     </View>
                                 </View>
 

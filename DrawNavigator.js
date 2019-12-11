@@ -33,6 +33,8 @@ import Havale from "./Screens/Havale";
 
 import Virman from "./Screens/Virman";
 
+import VirmanRecieve from "./Screens/VirmanRecieve";
+
 import Hgs from "./Screens/Hgs";
 
 import HgsRegister from "./Screens/HgsRegister";
@@ -150,6 +152,13 @@ const DrawerNavigator = createDrawerNavigator(
                 drawerLabel: <Hidden />
             }
         },
+        VirmanRecieve: {
+            screen: VirmanRecieve,
+            navigationOptions: {
+                title: "EmptyScr",
+                drawerLabel: <Hidden />
+            }
+        },
         Profil: {
             screen: ProfileScreen,
             navigationOptions: {
@@ -233,7 +242,7 @@ export default createAppContainer(
       {
         AuthLoading: AuthLoadingScreen,
         App: DrawerNavigator,
-        Auth: LoginStack,
+        Auth: Hgs,
       },
       {
         initialRouteName: 'AuthLoading',
