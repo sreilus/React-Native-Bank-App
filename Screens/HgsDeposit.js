@@ -58,6 +58,7 @@ export default class HgsDeposit extends React.Component {
         const { navigation } = this.props;
         this.state = {
             accounts: [{ accountNo: 555, balance: 50 }],
+            hgsUser: [{ Id: 1, hgsNo: 1000, balance: 500 }],
             isLoading: true,
             tcNumber: this.getTc(),
             result: 0,
@@ -112,7 +113,7 @@ export default class HgsDeposit extends React.Component {
         }
         this.setState({
             isFetching: false,
-          });
+        });
     }
 
     componentWillMount() {
@@ -139,8 +140,31 @@ export default class HgsDeposit extends React.Component {
         BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
     }
 
+    getHgsUser = async (hgsNo) => {
+        let url = 'https://rugratswebapi.azurewebsites.net/api/hgs/' + hgsNo;
+        console.log('url: ' + url)
+        await fetch(url)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({
+                    hgsUser: responseJson
+                }, function () {
+                    // console.log("yenii--- " + this.state.accounts[0].accountNo)
+                });
+
+            }).finally(() => {
+                if (this.state.hgsUser.hgsNo > 1000) {
+                    Alert.alert("Başarıyla Para Yatırıldı!" + '\n' + "Hgs Bakiyesi: " + this.state.hgsUser.balance+' ₺');
+                    this.listAccounts();
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
     depositHgs = async (balance, hgsNo) => {
-        console.log("tt: "+this.state.selectedAccountNo)
+        console.log("tt: " + this.state.selectedAccountNo)
         this.setState({ defaultAnimationModal: false });
         if (this.state.tcNumber !== null) {
             console.log('tc: ' + this.state.tcNumber)
@@ -153,8 +177,8 @@ export default class HgsDeposit extends React.Component {
                 method: 'PUT',
                 body: JSON.stringify({
                     accountNo: this.state.selectedAccountNo,
-                    HgsNo:hgsNo,
-                    balance : balance
+                    HgsNo: hgsNo,
+                    balance: balance
                 }),
                 headers: {
                     "Content-type": "application/json; charset=UTF-8"
@@ -174,11 +198,13 @@ export default class HgsDeposit extends React.Component {
                 let deger = '' + this.state.result;
                 console.log("deger:    " + deger + "  selected No: " + this.state.selectedAccountNo);
                 if (deger == "1") {
-                    Alert.alert("Başarıyla Para Yatırıldı!");
-                    this.listAccounts();
+                    this.getHgsUser(hgsNo);
                 }
                 else if (deger == "0") {
                     Alert.alert("Hesapta yeterli bakiye yok!");
+                }
+                else if (deger == "2") {
+                    Alert.alert("Kayıtlı Hgs No Bulunamadı!");
                 }
                 else if (deger == "3") {
                     Alert.alert(" Geçersiz bir para miktarı girdiniz!");
@@ -193,7 +219,7 @@ export default class HgsDeposit extends React.Component {
                     console.log("kapatt : " + deger)
                     alert("Para Yatırma İşlemi Başarısız Oldu!");
                 }
-               // this.setState({ defaultAnimationModal: false });
+                // this.setState({ defaultAnimationModal: false });
                 // console.log("finally " + this.state.accounts[0].accountNo)
             })
                 .catch((error) => {
@@ -203,14 +229,14 @@ export default class HgsDeposit extends React.Component {
         else {
             Alert.alert("Lütfen Giriş Yapınız!");
         }
-       
+
     }
     onRefresh = async () => {
         this.setState({
-          isFetching: true,
+            isFetching: true,
         });
         this.listAccounts();
-      }
+    }
 
     onBackPress = () => {
         Alert.alert(
@@ -262,8 +288,8 @@ export default class HgsDeposit extends React.Component {
                     />
                     <Formik initialValues={{ balance: 0, hgsNo: '' }}
                         onSubmit={(values, actions) => {
-                            this.depositHgs(values.balance,values.hgsNo);
-                            
+                            this.depositHgs(values.balance, values.hgsNo);
+
                             setTimeout(() => {
                                 actions.setSubmitting(false);
                             }, 1000);

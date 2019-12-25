@@ -39,10 +39,13 @@ import VirmanRecieve from "./Screens/VirmanRecieve";
 
 import Hgs from "./Screens/Hgs";
 
+import QueryHgs from "./Screens/QueryHgs";
+
 import HgsRegister from "./Screens/HgsRegister";
 
 import HgsDeposit from "./Screens/HgsDeposit";
 
+import CreditTransactions from "./Screens/CreditTransactions";
 
 import Register from "./Screens/Deneme";
 
@@ -147,6 +150,13 @@ const DrawerNavigator = createDrawerNavigator(
                 drawerLabel: <Hidden />
             }
         },
+        QueryHgs: {
+            screen: QueryHgs,
+            navigationOptions: {
+                title: "EmptyScr",
+                drawerLabel: <Hidden />
+            }
+        },
         HgsDeposit: {
             screen: HgsDeposit,
             navigationOptions: {
@@ -216,6 +226,13 @@ const DrawerNavigator = createDrawerNavigator(
                 drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="highway" size={16} color={tintColor} />
             }
         },
+        CrediTransactions: {
+            screen: CreditTransactions,
+            navigationOptions: {
+                title: "Kredi  İşlemleri",
+                drawerIcon: ({ tintColor }) => <MaterialCommunityIcons name="highway" size={16} color={tintColor} />
+            }
+        },
         SignOut: {
             screen: SignOut,
             navigationOptions: {
@@ -254,7 +271,7 @@ export default createAppContainer(
         Auth: LoginStack,
       },
       {
-        initialRouteName: 'AuthLoading',
+        initialRouteName: 'Auth',
       }
     )
   );

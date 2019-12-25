@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Platform, StyleSheet, View, Button, Picker, Alert, AsyncStorage, FlatList, TouchableWithoutFeedback } from "react-native";
+import { Platform, StyleSheet, View, Button, Picker, Alert, AsyncStorage, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 export default class Hgs extends Component {
 
@@ -131,9 +132,15 @@ export default class Hgs extends Component {
   render() {
     return (
       <View style={styles.container}>
-
-        <Button title="Hgs Hesabı Aç" style={{marginBottom:20}} onPress={() => this.props.navigation.navigate('HgsRegister', { tcNumber: this.state.tcNumber })} />
-       <Button title="Hgs'ye Para Yatır"  style={{margin:20}} onPress={() => this.props.navigation.navigate('HgsDeposit')} />
+        <TouchableOpacity
+          style={{ alignItems: "flex-start",  marginLeft: 16 }}
+          onPress={this.props.navigation.openDrawer}
+        >
+          <FontAwesome5 name="bars" size={24} color="#161924" />
+        </TouchableOpacity>
+        <Button title="Hgs Hesabı Aç" style={{ marginBottom: 20 }} onPress={() => this.props.navigation.navigate('HgsRegister', { tcNumber: this.state.tcNumber })} />
+        <Button title="Hgs Bakiyesi Sorgula" style={{ margin: 20 }} onPress={() => this.props.navigation.navigate('QueryHgs')} />
+        <Button title="Hgs'ye Para Yatır" style={{ margin: 20 }} onPress={() => this.props.navigation.navigate('HgsDeposit')} />
 
       </View>
     );
@@ -143,15 +150,15 @@ export default class Hgs extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     display: "flex",
     flexDirection: "column",
-    justifyContent : "space-around"
-},
-element: {
+    justifyContent: "space-around"
+  },
+  element: {
     margin: 5,
     borderWidth: 1,
     padding: 10,
     height: 50,
-},
+  },
 });
